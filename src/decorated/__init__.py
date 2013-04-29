@@ -1,0 +1,1 @@
+from decorated.function import Function

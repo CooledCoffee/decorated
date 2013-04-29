@@ -1,0 +1,11 @@
+# editor
+*~
+
+# hidden files
+.*
+
+# python
+*.pyc
+
+# package directories
+dist
