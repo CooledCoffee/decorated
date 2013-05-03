@@ -6,8 +6,10 @@ class Target(object):
     def __init__(self):
         self.a = 1
         self.b = 1
+        
     def foo(self):
         return 1
+    
     def bar(self):
         return 1
     
@@ -15,10 +17,18 @@ class FakeProxy(Proxy):
     def __init__(self, target):
         super(FakeProxy, self).__init__(target)
         self.b = 2
+        
     def bar(self):
         return 2
 
-class ProxyTest(TestCase):
+class GetAttrTest(TestCase):
+    def test_no_target(self):
+        proxy = FakeProxy(None)
+        try:
+            proxy.a
+        except Exception as e:
+            self.assertEquals("FakeProxy has no target.", e.message)
+        
     def test_static_target(self):
         target = Target()
         proxy = FakeProxy(target)

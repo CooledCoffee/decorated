@@ -3,7 +3,7 @@
 class Proxy(object):
     def __init__(self, target=None):
         super(Proxy, self).__init__()
-        self._orig_target = target
+        self.__target = target
         
     def __getattr__(self, name):
         if name in self.__dict__:
@@ -16,5 +16,7 @@ class Proxy(object):
                 raise AttributeError("'%s' object has no attribute '%s'" % (type(self).__name__, name))
     
     def _target(self):
-        return self._orig_target
+        if not self.__target:
+            raise Exception('%s has no target.' % type(self).__name__)
+        return self.__target
     
