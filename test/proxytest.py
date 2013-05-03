@@ -53,3 +53,28 @@ class GetAttrTest(TestCase):
         except AttributeError as e:
             self.assertEquals("'Target' object has no attribute 'c'", e.message)
             
+class HasAttrTest(TestCase):
+    def test_no_target(self):
+        proxy = FakeProxy(None)
+        try:
+            hasattr(proxy, 'a')
+        except Exception as e:
+            self.assertEquals("FakeProxy has no target.", e.message)
+        
+    def test_target_attr(self):
+        target = Target()
+        proxy = FakeProxy(target)
+        self.assertTrue(hasattr(proxy, 'a'))
+        self.assertTrue(hasattr(proxy, 'foo'))
+             
+    def test_proxy_attr(self):
+        target = Target()
+        proxy = FakeProxy(target)
+        self.assertTrue(hasattr(proxy, 'b'))
+        self.assertTrue(hasattr(proxy, 'bar'))
+             
+    def test_attr_not_found(self):
+        target = Target()
+        proxy = FakeProxy(target)
+        self.assertFalse(hasattr(proxy, 'c'))
+             
