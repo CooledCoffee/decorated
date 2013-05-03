@@ -3,6 +3,8 @@ from decorated.proxy import Proxy
 import functools
 import inspect
 
+WRAPPER_ASSIGNMENTS = ('__module__', '__name__', '__doc__', 'func_code')
+
 class Function(Proxy):
     def __init__(self, *args, **kw):
         self.params = None
@@ -34,10 +36,9 @@ class Function(Proxy):
     def _call(self, *args, **kw):
         return self._func(*args, **kw)
     
-    WRAPPER_ASSIGNMENTS = ('__module__', '__name__', '__doc__', 'func_code')
     def _decorate(self, func):
         self._func = func
-        functools.update_wrapper(self, func, Function.WRAPPER_ASSIGNMENTS, updated=())
+        functools.update_wrapper(self, func, WRAPPER_ASSIGNMENTS, updated=())
         if isinstance(func, Function):
             self.params = func.params
             self.required_params = func.required_params
