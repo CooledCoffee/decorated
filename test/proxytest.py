@@ -29,32 +29,17 @@ class GetAttrTest(TestCase):
         except Exception as e:
             self.assertEquals("FakeProxy has no target.", e.message)
         
-    def test_static_target(self):
+    def test_target_attr(self):
         target = Target()
         proxy = FakeProxy(target)
         self.assertEquals(1, proxy.a)
-        self.assertEquals(2, proxy.b)
         self.assertEquals(1, proxy.foo())
-        self.assertEquals(2, proxy.bar())
-        with self.assertRaises(AttributeError):
-            proxy.c
-        
-    def test_dynamic_target(self):
-        class FakeProxy(Proxy):
-            def __init__(self):
-                super(FakeProxy, self).__init__()
-                self.b = 2
-            def bar(self):
-                return 2
-            def _target(self):
-                return Target()
-        proxy = FakeProxy()
-        self.assertEquals(1, proxy.a)
+            
+    def test_proxy_attr(self):
+        target = Target()
+        proxy = FakeProxy(target)
         self.assertEquals(2, proxy.b)
-        self.assertEquals(1, proxy.foo())
         self.assertEquals(2, proxy.bar())
-        with self.assertRaises(AttributeError):
-            proxy.c
             
     def test_attr_not_found(self):
         # set up
@@ -66,5 +51,5 @@ class GetAttrTest(TestCase):
             proxy.c
             self.fail()
         except AttributeError as e:
-            self.assertEquals("'FakeProxy' object has no attribute 'c'", e.message)
+            self.assertEquals("'Target' object has no attribute 'c'", e.message)
             

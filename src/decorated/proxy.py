@@ -10,10 +10,7 @@ class Proxy(object):
             return self.__dict__[name]
         else:
             target = self._target()
-            try:
-                return getattr(target, name)
-            except AttributeError:
-                raise AttributeError("'%s' object has no attribute '%s'" % (type(self).__name__, name))
+            return getattr(target, name)
     
     def _target(self):
         if not self.__target:
