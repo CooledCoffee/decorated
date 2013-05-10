@@ -19,7 +19,7 @@ class DecorateTest(TestCase):
     def test_single_level(self):
         self.assertEquals('foo', foo.__name__)
         self.assertEquals(['id', 'name'], foo.params)
-        self.assertTrue(hasattr(foo, 'func_code'))
+        self.assertTrue(hasattr(foo, 'func_code') or hasattr(foo, '__code__'))
         self.assertEquals(['id', 'name'], foo.params)
         self.assertEquals(['id'], foo.required_params)
         self.assertEquals([('name','default name')], foo.optional_params)
@@ -28,7 +28,7 @@ class DecorateTest(TestCase):
         foo2 = Function(foo)
         self.assertEquals('foo', foo2.__name__)
         self.assertEquals(['id', 'name'], foo2.params)
-        self.assertTrue(hasattr(foo2, 'func_code'))
+        self.assertTrue(hasattr(foo2, 'func_code') or hasattr(foo2, '__code__'))
         
 class StrTest(TestCase):
     def test(self):

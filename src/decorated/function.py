@@ -3,7 +3,7 @@ from decorated.proxy import Proxy
 import functools
 import inspect
 
-WRAPPER_ASSIGNMENTS = ('__module__', '__name__', '__doc__', 'func_code')
+WRAPPER_ASSIGNMENTS = ('__module__', '__name__', '__doc__', '__code__', 'func_code')
 
 class Function(Proxy):
     def __init__(self, *args, **kw):
