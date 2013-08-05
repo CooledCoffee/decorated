@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-from decorated.function import Function, BoundedFunction
+from decorated.function import Function
 from unittest.case import TestCase
 
 @Function
@@ -114,8 +114,8 @@ class CallTest(TestCase):
         result = decorated(1, a=2)
         self.assertEquals(2, result)
         
-class BoundedFunctionTest(TestCase):
-    def test_single_level(self):
+class MethodTest(TestCase):
+    def test_instance_single_level(self):
         # set up
         class _Class(object):
             @Function
@@ -126,7 +126,7 @@ class BoundedFunctionTest(TestCase):
         ret = _Class().foo(111)
         self.assertEquals(111, ret)
         
-    def test_multi_levels(self):
+    def test_instance_multi_levels(self):
         # set up
         class _Class(object):
             @Function
@@ -138,7 +138,29 @@ class BoundedFunctionTest(TestCase):
         ret = _Class().foo(111)
         self.assertEquals(111, ret)
         
-    def test_static(self):
+    def test_static_method(self):
+        # set up
+        class _Class(object):
+            @staticmethod
+            @Function
+            def foo(id, name='default name'):
+                return id
+            
+        # test
+        self.assertEqual(111, _Class.foo(111))
+        
+    def test_class_method(self):
+        # set up
+        class _Class(object):
+            @classmethod
+            @Function
+            def foo(cls, id, name='default name'):
+                return id
+            
+        # test
+        self.assertEqual(111, _Class.foo(111))
+        
+    def test_get_method(self):
         # set up
         class _Class(object):
             @Function
@@ -146,7 +168,5 @@ class BoundedFunctionTest(TestCase):
                 return id
             
         # test
-        foo = _Class.foo
-        self.assertIsInstance(foo, Function)
-        self.assertNotIsInstance(foo, BoundedFunction)
+        self.assertIsInstance(_Class.foo, Function)
         
