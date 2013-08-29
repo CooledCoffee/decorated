@@ -98,13 +98,6 @@ def PartialFunction(func, init_args=(), call_args=()):
             self.params = self.params[len(call_args):]
             self.required_params = self.params[len(call_args):]
     return _PartialFunction
-            
-class BoundedFunction(Function):
-    def __init__(self, func, instance):
-        super(BoundedFunction, self).__init__(func)
-        self._instance = instance
         
-    def __call__(self, *args, **kw):
-        args = [self._instance] + list(args)
-        return self._func(*args, **kw)
-        
+def BoundedFunction(func, instance):
+    return PartialFunction(Function, call_args=(instance,))(func)

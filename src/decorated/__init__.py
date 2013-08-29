@@ -1,1 +1,1 @@
-from decorated.function import Function
+from decorated.function import Function, BoundedFunction, PartialFunction
