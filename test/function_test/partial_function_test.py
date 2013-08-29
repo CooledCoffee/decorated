@@ -2,17 +2,17 @@
 from decorated.function import Function, PartialFunction
 from unittest.case import TestCase
 
-def foo(d, e, f):
+def foo(d, e, f=None):
     return d + e + f
 
 class FullDecorator(Function):
-    def _init(self, a, b, c):
+    def _init(self, a, b, c=None):
         self.a = a
         self.b = b
         self.c = c
     
 class InitTest(TestCase):
-    def test_without_args(self):
+    def test_with_nothing(self):
         partial_decorator = PartialFunction(FullDecorator)
         decorated = partial_decorator(1, 2, 3)(foo)
         self.assertEqual(1, decorated.a)
@@ -25,9 +25,16 @@ class InitTest(TestCase):
         self.assertEqual(1, decorated.a)
         self.assertEqual(2, decorated.b)
         self.assertEqual(3, decorated.c)
+        
+    def test_with_kw(self):
+        partial_decorator = PartialFunction(FullDecorator, init_kw={'c': 3})
+        decorated = partial_decorator(1, 2)(foo)
+        self.assertEqual(1, decorated.a)
+        self.assertEqual(2, decorated.b)
+        self.assertEqual(3, decorated.c)
 
 class CallTest(TestCase):
-    def test_without_args(self):
+    def test_with_nothing(self):
         partial_decorator = PartialFunction(FullDecorator)
         decorated = partial_decorator(1, 2, 3)(foo)
         self.assertEqual(('d', 'e', 'f'), decorated.params)
@@ -39,5 +46,14 @@ class CallTest(TestCase):
         decorated = partial_decorator(1, 2, 3)(foo)
         self.assertEqual(('f',), decorated.params)
         result = decorated(6)
+        self.assertEqual(15, result)
+        
+    def test_with_kw(self):
+        partial_decorator = PartialFunction(FullDecorator, call_kw={'f': 6})
+        decorated = partial_decorator(1, 2, 3)(foo)
+        self.assertEqual(('d', 'e'), decorated.params)
+        self.assertEqual(('d', 'e'), decorated.required_params)
+        self.assertEqual((), decorated.optional_params)
+        result = decorated(4, 5)
         self.assertEqual(15, result)
         

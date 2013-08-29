@@ -83,20 +83,30 @@ class Function(Proxy):
     def _target(self):
         return self._func
     
-def PartialFunction(func, init_args=(), call_args=()):
+def PartialFunction(func, init_args=(), init_kw=None, call_args=(), call_kw=None):
+    if init_kw is None:
+        init_kw = {}
+    if call_kw is None:
+        call_kw = {}
     class _PartialFunction(func):
         def _init(self, *args, **kw):
             args = tuple(init_args) + args
+            kw.update(init_kw)
             super(_PartialFunction, self)._init(*args, **kw)
             
         def _call(self, *args, **kw):
             args = tuple(call_args) + args
-            return super(_PartialFunction, self)._call(*args, **kw)
+            merged_kw = dict(call_kw)
+            merged_kw.update(kw)
+            return super(_PartialFunction, self)._call(*args, **merged_kw)
             
         def _parse_params(self, func):
             super(_PartialFunction, self)._parse_params(func)
             self.params = self.params[len(call_args):]
             self.required_params = self.params[len(call_args):]
+            self.params = tuple([p for p in self.params if p not in call_kw])
+            self.required_params = tuple([p for p in self.required_params if p not in call_kw])
+            self.optional_params = tuple([(k, v) for (k, v) in self.optional_params if k not in call_kw])
     return _PartialFunction
         
 def BoundedFunction(func, instance):
