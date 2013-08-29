@@ -51,7 +51,7 @@ class GetAttrTest(TestCase):
             proxy.c
             self.fail()
         except AttributeError as e:
-            self.assertEquals("'Target' object has no attribute 'c'", str(e))
+            self.assertEquals("'FakeProxy' object has no attribute 'c'", str(e))
             
 class HasAttrTest(TestCase):
     def test_no_target(self):
