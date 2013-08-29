@@ -9,25 +9,25 @@ def foo(id, name='default name'):
 class InitTest(TestCase):
     def test_no_arg(self):
         decorated = Function(foo)
-        self.assertEquals(['id', 'name'], decorated.params)
+        self.assertEquals(('id', 'name'), decorated.params)
         
     def test_with_args(self):
         decorated = Function(1, b=2)(foo)
-        self.assertEquals(['id', 'name'], decorated.params)
+        self.assertEquals(('id', 'name'), decorated.params)
 
 class DecorateTest(TestCase):
     def test_single_level(self):
         self.assertEquals('foo', foo.__name__)
-        self.assertEquals(['id', 'name'], foo.params)
+        self.assertEquals(('id', 'name'), foo.params)
         self.assertTrue(hasattr(foo, 'func_code') or hasattr(foo, '__code__'))
-        self.assertEquals(['id', 'name'], foo.params)
-        self.assertEquals(['id'], foo.required_params)
-        self.assertEquals([('name','default name')], foo.optional_params)
+        self.assertEquals(('id', 'name'), foo.params)
+        self.assertEquals(('id',), foo.required_params)
+        self.assertEquals((('name','default name'),), foo.optional_params)
         
     def test_multi_levels(self):
         foo2 = Function(foo)
         self.assertEquals('foo', foo2.__name__)
-        self.assertEquals(['id', 'name'], foo2.params)
+        self.assertEquals(('id', 'name'), foo2.params)
         self.assertTrue(hasattr(foo2, 'func_code') or hasattr(foo2, '__code__'))
         
 class StrTest(TestCase):

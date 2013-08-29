@@ -64,7 +64,10 @@ class Function(Proxy):
                 self.optional_params.append((self.params[-1 - i], defaults[-1 - i]))
         else:
             self.required_params = self.params
-            self.optional_params = []
+            self.optional_params = ()
+        self.params = tuple(self.params)
+        self.required_params = tuple(self.required_params)
+        self.optional_params = tuple(self.optional_params)
             
     def _resolve_args(self, *args, **kw):
         d = {name: default for name, default in self.optional_params}
@@ -79,6 +82,22 @@ class Function(Proxy):
     
     def _target(self):
         return self._func
+    
+def PartialFunction(func, init_args=(), call_args=()):
+    class _PartialFunction(func):
+        def _init(self, *args, **kw):
+            args = tuple(init_args) + args
+            super(_PartialFunction, self)._init(*args, **kw)
+            
+        def _call(self, *args, **kw):
+            args = tuple(call_args) + args
+            return super(_PartialFunction, self)._call(*args, **kw)
+            
+        def _parse_params(self, func):
+            super(_PartialFunction, self)._parse_params(func)
+            self.params = self.params[len(call_args):]
+            self.required_params = self.params[len(call_args):]
+    return _PartialFunction
             
 class BoundedFunction(Function):
     def __init__(self, func, instance):
