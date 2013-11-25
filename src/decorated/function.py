@@ -28,6 +28,12 @@ class Function(object):
         else:
             # access in static way (e.g., Foo.bar)
             return self
+        
+    def __getattr__(self, name):
+        if name in self.__dict__:
+            return self.__dict__[name]
+        else:
+            return getattr(self._func, name)
     
     def __str__(self):
         return '<Function %s.%s>' % (self._func.__module__, self.__name__)

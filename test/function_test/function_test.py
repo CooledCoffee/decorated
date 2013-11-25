@@ -41,6 +41,27 @@ class TargetTest(TestCase):
         target = bar.target()
         self.assertTrue(inspect.isfunction(target))
         
+class GetAttrTest(TestCase):
+    def test(self):
+        # set up
+        class Function1(Function):
+            def a(self):
+                return 'a'
+        class Function2(Function):
+            def b(self):
+                return 'b'
+        def foo():
+            pass
+        foo.c = lambda: 'c'
+        foo = Function1(Function2(foo))
+        
+        # test
+        self.assertEqual('a', foo.a())
+        self.assertEqual('b', foo.b())
+        self.assertEqual('c', foo.c())
+        with self.assertRaises(AttributeError):
+            foo.d()
+        
 class StrTest(TestCase):
     def test(self):
         s = str(foo)
