@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from decorated.function import Function
 from unittest.case import TestCase
+import inspect
 
 @Function
 def foo(id, name='default name'):
@@ -29,6 +30,16 @@ class DecorateTest(TestCase):
         self.assertEquals('foo', foo2.__name__)
         self.assertEquals(('id', 'name'), foo2.params)
         self.assertTrue(hasattr(foo2, 'func_code') or hasattr(foo2, '__code__'))
+        
+class TargetTest(TestCase):
+    def test_raw_function(self):
+        target = foo.target()
+        self.assertTrue(inspect.isfunction(target))
+
+    def test_function_wrapper(self):
+        bar = Function(foo)
+        target = bar.target()
+        self.assertTrue(inspect.isfunction(target))
         
 class StrTest(TestCase):
     def test(self):

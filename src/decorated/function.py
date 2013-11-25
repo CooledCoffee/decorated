@@ -32,6 +32,9 @@ class Function(object):
     def __str__(self):
         return '<Function %s.%s>' % (self._func.__module__, self.__name__)
     
+    def target(self):
+        return self._func.target() if isinstance(self._func, Function) else self._func
+    
     def _call(self, *args, **kw):
         return self._func(*args, **kw)
     
