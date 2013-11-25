@@ -1,11 +1,10 @@
 # -*- coding: UTF-8 -*-
-from decorated.proxy import Proxy
 import functools
 import inspect
 
 WRAPPER_ASSIGNMENTS = ('__module__', '__name__', '__doc__', '__code__', 'func_code')
 
-class Function(Proxy):
+class Function(object):
     def __init__(self, *args, **kw):
         self.params = None
         self.required_params = None
@@ -79,9 +78,6 @@ class Function(Proxy):
                 raise Exception('Missing argument "%s" for %s.' % (name, str(self)))
         d = {k: v for k, v in d.items() if k in self.params}
         return d
-    
-    def _target(self):
-        return self._func
     
 def PartialFunction(func, init_args=(), init_kw=None, call_args=(), call_kw=None):
     if init_kw is None:
