@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+import doctest
 import functools
 import inspect
 
@@ -77,6 +78,9 @@ class Function(object):
         else:
             self.required_params = self.params
             self.optional_params = ()
+        if _is_bound_method(func):
+            self.params = self.params[1:]
+            self.required_params = self.required_params[1:]
         self.params = tuple(self.params)
         self.required_params = tuple(self.required_params)
         self.optional_params = tuple(self.optional_params)
@@ -120,3 +124,27 @@ def PartialFunction(func, init_args=(), init_kw=None, call_args=(), call_kw=None
         
 def BoundedFunction(func, instance):
     return PartialFunction(Function, call_args=(instance,))(func)
+
+def _is_bound_method(func):
+    '''
+    >>> def foo():
+    ...     pass
+    >>> _is_bound_method(foo)
+    False
+    
+    >>> class Foo(object):
+    ...     def bar(self):
+    ...         pass
+    >>> _is_bound_method(Foo.bar)
+    False
+    >>> _is_bound_method(Foo().bar)
+    True
+    '''
+    try:
+        return func.__self__ is not None
+    except:
+        return False
+
+if __name__ == '__main__':
+    doctest.testmod()
+    

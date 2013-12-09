@@ -31,6 +31,13 @@ class DecorateTest(TestCase):
         self.assertEquals(('id', 'name'), foo2.params)
         self.assertTrue(hasattr(foo2, 'func_code') or hasattr(foo2, '__code__'))
         
+    def test_method(self):
+        class Foo(object):
+            def bar(self, a, b):
+                pass
+        self.assertEqual(('self', 'a', 'b'), Function(Foo.bar).params)
+        self.assertEqual(('a', 'b'), Function(Foo().bar).params)
+        
 class TargetTest(TestCase):
     def test_raw_function(self):
         target = foo.target()
