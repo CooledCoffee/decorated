@@ -33,7 +33,11 @@ class Function(object):
         if name in self.__dict__:
             return self.__dict__[name]
         else:
-            return getattr(self._func, name)
+            target = self.__dict__.get('_func')
+            if target:
+                return getattr(target, name)
+            else:
+                raise AttributeError('%s object has no attribute "foo", and target is not available.' % type(self))
     
     def __str__(self):
         return '<Function %s.%s>' % (self._func.__module__, self.__name__)
