@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from decorated.util import retries
+from decorated.util.retries import retries
 from unittest.case import TestCase
 
 class RetriesTest(TestCase):
