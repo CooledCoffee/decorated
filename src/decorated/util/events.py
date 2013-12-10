@@ -48,7 +48,10 @@ class Event(with_metaclass(EventMetaType, Function)):
         
         return ret
     
-    def _condition(self):
+    def _after_condition(self):
+        return True
+    
+    def _before_condition(self):
         return True
     
     def _decorate(self, func):
@@ -66,15 +69,16 @@ class Event(with_metaclass(EventMetaType, Function)):
     
     def _init(self):
         super(Event, self)._init()
-        self._condition = RemoveExtraArgs(self._condition)
+        self._before_condition = RemoveExtraArgs(self._before_condition)
+        self._after_condition = RemoveExtraArgs(self._after_condition)
     
     def _trigger_after_listeners(self, values):
-        if self._condition(**values):
+        if self._after_condition(**values):
             for listener in type(self)._after_listeners:
                 listener._call(**values)
             
     def _trigger_before_listeners(self, values):
-        if self._condition(**values):
+        if self._before_condition(**values):
             for listener in type(self)._before_listeners:
                 listener._call(**values)
             

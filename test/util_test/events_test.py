@@ -96,18 +96,34 @@ class CallTest(EventTest):
         foo(1, 2)
         self.assertEquals([1, 1, 3], self.called)
         
-    def test_conditional(self):
+    def test_before_condition(self):
         # set up
         class ConditionalEvent(FooEvent):
-            def _condition(self, a):
+            def _before_condition(self, a):
                 return a == 2
         self.called = []
         @ConditionalEvent
         def foo(a, b):
             return a + b
         @ConditionalEvent.before
-        def before_foo(a):
+        def after_foo(a):
             self.called.append(a)
+        
+        # test
+        foo(1, 1)
+        self.assertEquals([], self.called)
+        foo(2, 1)
+        self.assertEquals([2], self.called)
+        
+    def test_after_condition(self):
+        # set up
+        class ConditionalEvent(FooEvent):
+            def _after_condition(self, z):
+                return z == 3
+        self.called = []
+        @ConditionalEvent
+        def foo(a, b):
+            return a + b
         @ConditionalEvent.after
         def after_foo1(a):
             self.called.append(a)
@@ -119,5 +135,5 @@ class CallTest(EventTest):
         foo(1, 1)
         self.assertEquals([], self.called)
         foo(2, 1)
-        self.assertEquals([2, 2, 3], self.called)
+        self.assertEquals([2, 3], self.called)
         
