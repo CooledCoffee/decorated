@@ -11,9 +11,14 @@ _LISTENERS = defaultdict(list)
 
 class EventMetaType(type):
     @property
+    def full_name(self):
+        return _get_full_name(self)
+    
+    @property
     def post(self):
         class _EventListener(EventListener):
             name = self.name
+            _event_class = self
         return _EventListener
 
 class BaseEvent(Function):
@@ -23,7 +28,8 @@ class BaseEvent(Function):
         return True
     
 class Event(with_metaclass(EventMetaType, BaseEvent)):
-    ret_var = None
+    fields = ()
+    ret_field = None
     
     def _call(self, *args, **kw):
         ret = super(Event, self)._call(*args, **kw)
@@ -33,15 +39,22 @@ class Event(with_metaclass(EventMetaType, BaseEvent)):
         return ret
     
     def _decorate(self, func):
+        super(Event, self)._decorate(func)
+        self._validate()
         _EVENTS[self.name].append(self)
-        return super(Event, self)._decorate(func)
+        return self
     
     def _trigger_listeners(self, ret, *args, **kw):
-        if self.ret_var:
-            kw[self.ret_var] = ret
+        if self.ret_field:
+            kw[self.ret_field] = ret
         for listener in _LISTENERS[self.name]:
             d = listener._resolve_args(*args, **kw)
             listener._call(**d)
+            
+    def _validate(self):
+        for field in self.fields:
+            if field not in self.params:
+                raise EventError('Missing field "%s" in "%s".' % (field, type(self).full_name))
         
 class EventListener(BaseEvent):
     def _call(self, *args, **kw):
@@ -51,15 +64,24 @@ class EventListener(BaseEvent):
             return super(EventListener, self)._call(*args, **kw)
         
     def _decorate(self, func):
+        super(EventListener, self)._decorate(func)
+        self._validate()
         _LISTENERS[self.name].append(self)
-        return super(EventListener, self)._decorate(func)
+        return self
     
+    def _validate(self):
+        for param in self.params:
+            if param != self._event_class.ret_field and param not in self._event_class.fields:
+                raise EventError('Event "%s" does not have field "%s".' % (self._event_class.full_name, param))
+    
+class EventError(Exception): pass
+
 def init(packages):
     global _INITED
-    if not _INITED:
-        util.load_modules(packages)
-        _validate()
-        _INITED = True
+    if _INITED:
+        return
+    util.load_modules(packages)
+    _INITED = True
 
 def _get_full_name(func):
     '''
@@ -68,28 +90,6 @@ def _get_full_name(func):
     'decorated.util.load_modules'
     '''
     return '%s.%s' % (func.__module__, func.__name__)
-
-def _validate():
-    _validate_events()
-    _validate_listeners()
-    
-def _validate_events():
-    for name, events in _EVENTS.items():
-        for Event in events:
-            if Event.ret_var != events[0].ret_var:
-                raise Exception('There are multi definitions of Event %s which are not consistent.' % name)
-    
-def _validate_listeners():
-    for event_name, listeners in _LISTENERS.items():
-        if event_name not in _EVENTS:
-            raise Exception('Event %s not found.' % event_name)
-        Event = _EVENTS[event_name][0]
-        allowed_params = Event.params + (Event.ret_var,) # ok even if _ret_var is None
-        for listener in listeners:
-            for param in listener.params:
-                if param not in allowed_params:
-                    raise Exception('Event listener %s refer to param %s which is not presented in Event %s.' \
-                            % (_get_full_name(listener), param, event_name))
 
 if __name__ == '__main__':
     doctest.testmod()

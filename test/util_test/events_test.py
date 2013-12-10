@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 from decorated.util import events
-from decorated.util.events import Event, EventListener
+from decorated.util.events import Event, EventError
 from unittest.case import TestCase
 
 class FooEvent(Event):
     name = 'foo'
-    ret_var = 'c'
+    fields = ('a', 'b')
+    ret_field = 'z'
     
 class EventTest(TestCase):
     def setUp(self):
@@ -15,68 +16,82 @@ class EventTest(TestCase):
 
 class DecorateTest(EventTest):
     def test(self):
-        @FooEvent(ret_var='c')
+        @FooEvent
         def foo1(a, b):
             return 3
-        @FooEvent(ret_var='c')
+        @FooEvent
         def foo2(a, b):
             return 3
         @FooEvent.post
         def post_foo1(a):
             pass
         @FooEvent.post
-        def post_foo2(c):
+        def post_foo2(z):
             pass
         self.assertEquals({'foo': [foo1, foo2]}, events._EVENTS)
         self.assertEquals({'foo': [post_foo1, post_foo2]}, events._LISTENERS)
         
-class ValidateTest(EventTest):
+class EventValidateTest(EventTest):
     def test_valid(self):
         @FooEvent
         def foo1(a, b):
-            return 3
+            pass
         @FooEvent
-        def foo2(a, b):
-            return 3
+        def foo2(a, b, c):
+            pass
+        
+    def test_invalid(self):
+        with self.assertRaises(EventError):
+            @FooEvent
+            def foo1(c):
+                pass
+        with self.assertRaises(EventError):
+            @FooEvent
+            def foo2(a):
+                pass
+            
+    def test_empty_fields(self):
+        @Event
+        def foo(a, b):
+            pass
+            
+class EventListenerValidateTest(EventTest):
+    def test_valid(self):
         @FooEvent.post
         def post_foo1(a):
             pass
         @FooEvent.post
-        def post_foo2(c):
-            pass
-        events._validate()
-        
-    def test_event_not_found(self):
-        class PostFooEvent2(EventListener):
-            name = 'foo2'
-        @PostFooEvent2
-        def post_foo2(a):
-            pass
-        with self.assertRaises(Exception):
-            events._validate()
-            
-    def test_invalid_params(self):
-        @FooEvent
-        def foo(a, b):
+        def post_foo2(a, b):
             pass
         @FooEvent.post
-        def post_foo(d):
+        def post_foo3(a, z):
             pass
-        with self.assertRaises(Exception):
-            events._validate()
-            
+        @FooEvent.post
+        def post_foo4(a, b, z):
+            pass
+        
+    def test_invalid(self):
+        with self.assertRaises(EventError):
+            @FooEvent.post
+            def post_foo1(c):
+                pass
+        with self.assertRaises(EventError):
+            @FooEvent.post
+            def post_foo2(a, b, z, c):
+                pass
+    
 class CallTest(EventTest):
     def test_simple(self):
         self.called = set()
-        @FooEvent(ret_var='c')
+        @FooEvent
         def foo(a, b):
             return 3
         @FooEvent.post
         def post_foo1(a):
             self.called.add(a)
         @FooEvent.post
-        def post_foo2(c):
-            self.called.add(c)
+        def post_foo2(z):
+            self.called.add(z)
         foo(1, 2)
         self.assertEquals({1, 3}, self.called)
         
@@ -86,7 +101,7 @@ class CallTest(EventTest):
             def _condition(self, ret, *args, **kw):
                 return ret == 3
         called = set()
-        @conditional_event(ret_var='c')
+        @conditional_event
         def foo(a, b):
             return a + b
         @FooEvent.post
