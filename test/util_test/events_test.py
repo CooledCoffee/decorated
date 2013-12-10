@@ -22,10 +22,10 @@ class DecorateTest(EventTest):
         @FooEvent
         def foo2(a, b):
             return 3
-        @FooEvent.post
+        @FooEvent.after
         def post_foo1(a):
             pass
-        @FooEvent.post
+        @FooEvent.after
         def post_foo2(z):
             pass
         self.assertEquals([foo1, foo2], FooEvent._sources)
@@ -57,26 +57,26 @@ class EventValidateTest(EventTest):
             
 class EventListenerValidateTest(EventTest):
     def test_valid(self):
-        @FooEvent.post
+        @FooEvent.after
         def post_foo1(a):
             pass
-        @FooEvent.post
+        @FooEvent.after
         def post_foo2(a, b):
             pass
-        @FooEvent.post
+        @FooEvent.after
         def post_foo3(a, z):
             pass
-        @FooEvent.post
+        @FooEvent.after
         def post_foo4(a, b, z):
             pass
         
     def test_invalid(self):
         with self.assertRaises(EventError):
-            @FooEvent.post
+            @FooEvent.after
             def post_foo1(c):
                 pass
         with self.assertRaises(EventError):
-            @FooEvent.post
+            @FooEvent.after
             def post_foo2(a, b, z, c):
                 pass
     
@@ -86,10 +86,10 @@ class CallTest(EventTest):
         @FooEvent
         def foo(a, b):
             return 3
-        @FooEvent.post
+        @FooEvent.after
         def post_foo1(a):
             self.called.add(a)
-        @FooEvent.post
+        @FooEvent.after
         def post_foo2(z):
             self.called.add(z)
         foo(1, 2)
@@ -104,7 +104,7 @@ class CallTest(EventTest):
         @ConditionalEvent
         def foo(a, b):
             return a + b
-        @ConditionalEvent.post
+        @ConditionalEvent.after
         def post_foo(a):
             called.add(a)
         
@@ -116,7 +116,7 @@ class CallTest(EventTest):
         
     def test_conditional_listener(self):
         # set up
-        class conditional_post_event(FooEvent.post):
+        class conditional_post_event(FooEvent.after):
             def _condition(self, ret, a):
                 return a == 2
         called = set()

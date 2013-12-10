@@ -17,7 +17,7 @@ class EventMetaType(type):
         return _get_full_name(self)
     
     @property
-    def post(self):
+    def after(self):
         class _EventListener(EventListener):
             _event_class = self
         return _EventListener
