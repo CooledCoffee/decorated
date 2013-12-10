@@ -1,29 +1,28 @@
 # -*- coding: utf-8 -*-
-from collections import defaultdict
 from decorated import Function, util
 from six import with_metaclass
 import doctest
 
 ENABLED = True
 _INITED = False
-_EVENTS = defaultdict(list)
-_LISTENERS = defaultdict(list)
 
 class EventMetaType(type):
+    def __init__(self, name, bases, attrs):
+        super(EventMetaType, self).__init__(name, bases, attrs)
+        self._sources = []
+        self._after_listeners = []
+        
     @property
-    def full_name(self):
+    def name(self):
         return _get_full_name(self)
     
     @property
     def post(self):
         class _EventListener(EventListener):
-            name = self.name
             _event_class = self
         return _EventListener
 
 class BaseEvent(Function):
-    name = None
-    
     def _condition(self, ret, *args, **kw):
         return True
     
@@ -41,20 +40,20 @@ class Event(with_metaclass(EventMetaType, BaseEvent)):
     def _decorate(self, func):
         super(Event, self)._decorate(func)
         self._validate()
-        _EVENTS[self.name].append(self)
+        type(self)._sources.append(self)
         return self
     
     def _trigger_listeners(self, ret, *args, **kw):
         if self.ret_field:
             kw[self.ret_field] = ret
-        for listener in _LISTENERS[self.name]:
+        for listener in type(self)._after_listeners:
             d = listener._resolve_args(*args, **kw)
             listener._call(**d)
             
     def _validate(self):
         for field in self.fields:
             if field not in self.params:
-                raise EventError('Missing field "%s" in "%s".' % (field, type(self).full_name))
+                raise EventError('Missing field "%s" in "%s".' % (field, type(self).name))
         
 class EventListener(BaseEvent):
     def _call(self, *args, **kw):
@@ -66,13 +65,13 @@ class EventListener(BaseEvent):
     def _decorate(self, func):
         super(EventListener, self)._decorate(func)
         self._validate()
-        _LISTENERS[self.name].append(self)
+        self._event_class._after_listeners.append(self)
         return self
     
     def _validate(self):
         for param in self.params:
             if param != self._event_class.ret_field and param not in self._event_class.fields:
-                raise EventError('Event "%s" does not have field "%s".' % (self._event_class.full_name, param))
+                raise EventError('Event "%s" does not have field "%s".' % (self._event_class.name, param))
     
 class EventError(Exception): pass
 

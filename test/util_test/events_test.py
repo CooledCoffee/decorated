@@ -11,8 +11,8 @@ class FooEvent(Event):
 class EventTest(TestCase):
     def setUp(self):
         super(EventTest, self).setUp()
-        events._EVENTS.clear()
-        events._LISTENERS.clear()
+        FooEvent._sources = []
+        FooEvent._after_listeners = []
 
 class DecorateTest(EventTest):
     def test(self):
@@ -28,8 +28,8 @@ class DecorateTest(EventTest):
         @FooEvent.post
         def post_foo2(z):
             pass
-        self.assertEquals({'foo': [foo1, foo2]}, events._EVENTS)
-        self.assertEquals({'foo': [post_foo1, post_foo2]}, events._LISTENERS)
+        self.assertEquals([foo1, foo2], FooEvent._sources)
+        self.assertEquals([post_foo1, post_foo2], FooEvent._after_listeners)
         
 class EventValidateTest(EventTest):
     def test_valid(self):
@@ -97,14 +97,14 @@ class CallTest(EventTest):
         
     def test_conditional_event(self):
         # set up
-        class conditional_event(FooEvent):
+        class ConditionalEvent(FooEvent):
             def _condition(self, ret, *args, **kw):
                 return ret == 3
         called = set()
-        @conditional_event
+        @ConditionalEvent
         def foo(a, b):
             return a + b
-        @FooEvent.post
+        @ConditionalEvent.post
         def post_foo(a):
             called.add(a)
         
