@@ -22,11 +22,7 @@ class EventMetaType(type):
             _event_class = self
         return _EventListener
 
-class BaseEvent(Function):
-    def _condition(self, ret, *args, **kw):
-        return True
-    
-class Event(with_metaclass(EventMetaType, BaseEvent)):
+class Event(with_metaclass(EventMetaType, Function)):
     fields = ()
     ret_field = None
     
@@ -36,6 +32,9 @@ class Event(with_metaclass(EventMetaType, BaseEvent)):
             if self._condition(ret, *args, **kw):
                 self._trigger_listeners(ret, *args, **kw)
         return ret
+    
+    def _condition(self, ret, *args, **kw):
+        return True
     
     def _decorate(self, func):
         super(Event, self)._decorate(func)
@@ -55,12 +54,11 @@ class Event(with_metaclass(EventMetaType, BaseEvent)):
             if field not in self.params:
                 raise EventError('Missing field "%s" in "%s".' % (field, type(self).name))
         
-class EventListener(BaseEvent):
+class EventListener(Function):
     def _call(self, *args, **kw):
         if not ENABLED:
             return super(EventListener, self)._call(*args, **kw)
-        if self._condition(None, *args, **kw):
-            return super(EventListener, self)._call(*args, **kw)
+        return super(EventListener, self)._call(*args, **kw)
         
     def _decorate(self, func):
         super(EventListener, self)._decorate(func)

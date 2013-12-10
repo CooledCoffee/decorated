@@ -95,7 +95,7 @@ class CallTest(EventTest):
         foo(1, 2)
         self.assertEquals({1, 3}, self.called)
         
-    def test_conditional_event(self):
+    def test_conditional(self):
         # set up
         class ConditionalEvent(FooEvent):
             def _condition(self, ret, *args, **kw):
@@ -105,25 +105,6 @@ class CallTest(EventTest):
         def foo(a, b):
             return a + b
         @ConditionalEvent.after
-        def post_foo(a):
-            called.add(a)
-        
-        # test
-        foo(1, 1)
-        self.assertEquals(set(), called)
-        foo(2, 1)
-        self.assertEquals({2}, called)
-        
-    def test_conditional_listener(self):
-        # set up
-        class conditional_post_event(FooEvent.after):
-            def _condition(self, ret, a):
-                return a == 2
-        called = set()
-        @FooEvent
-        def foo(a, b):
-            return 3
-        @conditional_post_event
         def post_foo(a):
             called.add(a)
         
