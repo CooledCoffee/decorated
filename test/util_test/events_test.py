@@ -21,13 +21,13 @@ class DecorateTest(EventTest):
         def foo2(a, b):
             return 3
         @FooEvent.after
-        def post_foo1(a):
+        def after_foo1(a):
             pass
         @FooEvent.after
-        def post_foo2(z):
+        def after_foo2(z):
             pass
         self.assertEquals([foo1, foo2], FooEvent._sources)
-        self.assertEquals([post_foo1, post_foo2], FooEvent._after_listeners)
+        self.assertEquals([after_foo1, after_foo2], FooEvent._after_listeners)
         
 class EventValidateTest(EventTest):
     def test_valid(self):
@@ -56,59 +56,68 @@ class EventValidateTest(EventTest):
 class EventListenerValidateTest(EventTest):
     def test_valid(self):
         @FooEvent.after
-        def post_foo1(a):
+        def after_foo1(a):
             pass
         @FooEvent.after
-        def post_foo2(a, b):
+        def after_foo2(a, b):
             pass
         @FooEvent.after
-        def post_foo3(a, z):
+        def after_foo3(a, z):
             pass
         @FooEvent.after
-        def post_foo4(a, b, z):
+        def after_foo4(a, b, z):
             pass
         
     def test_invalid(self):
         with self.assertRaises(EventError):
             @FooEvent.after
-            def post_foo1(c):
+            def after_foo1(c):
                 pass
         with self.assertRaises(EventError):
             @FooEvent.after
-            def post_foo2(a, b, z, c):
+            def after_foo2(a, b, z, c):
                 pass
     
 class CallTest(EventTest):
     def test_simple(self):
-        self.called = set()
+        self.called = []
         @FooEvent
         def foo(a, b):
-            return 3
+            return a + b
+        @FooEvent.before
+        def before_foo(a):
+            self.called.append(a)
         @FooEvent.after
-        def post_foo1(a):
-            self.called.add(a)
+        def after_foo1(a):
+            self.called.append(a)
         @FooEvent.after
-        def post_foo2(z):
-            self.called.add(z)
+        def after_foo2(z):
+            self.called.append(z)
         foo(1, 2)
-        self.assertEquals({1, 3}, self.called)
+        self.assertEquals([1, 1, 3], self.called)
         
     def test_conditional(self):
         # set up
         class ConditionalEvent(FooEvent):
-            def _condition(self, z):
-                return z == 3
-        called = set()
+            def _condition(self, a):
+                return a == 2
+        self.called = []
         @ConditionalEvent
         def foo(a, b):
             return a + b
+        @ConditionalEvent.before
+        def before_foo(a):
+            self.called.append(a)
         @ConditionalEvent.after
-        def post_foo(a):
-            called.add(a)
+        def after_foo1(a):
+            self.called.append(a)
+        @ConditionalEvent.after
+        def after_foo2(z):
+            self.called.append(z)
         
         # test
         foo(1, 1)
-        self.assertEquals(set(), called)
+        self.assertEquals([], self.called)
         foo(2, 1)
-        self.assertEquals({2}, called)
+        self.assertEquals([2, 2, 3], self.called)
         
