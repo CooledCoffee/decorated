@@ -16,6 +16,9 @@ setup(
         'Topic :: Software Development :: Libraries',
     ],
     description='Base components for easily writing decorators.',
+    install_requires=[
+        'six',
+    ],
     packages=['decorated'],
     url='https://github.com/CooledCoffee/decorated/',
 )
