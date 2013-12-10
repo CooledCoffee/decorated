@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-from decorated import compatibility
 from decorated.function import Function
+import six
 
 class conditional(Function):
     def _call(self, *args, **kw):
         func_kw = self._resolve_args(*args, **kw)
-        if isinstance(self._condition, compatibility.STRING_TYPE):
+        if isinstance(self._condition, six.string_types):
             condition = eval(self._condition, func_kw)
         else:
             condition_kw = self._condition._resolve_args(**func_kw)
@@ -18,7 +18,7 @@ class conditional(Function):
     
     def _init(self, condition=None):
         if condition:
-            if isinstance(condition, compatibility.STRING_TYPE):
+            if isinstance(condition, six.string_types):
                 self._condition = condition
             elif callable(condition):
                 self._condition = Function(condition)
