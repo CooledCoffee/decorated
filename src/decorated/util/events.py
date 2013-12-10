@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from decorated import Function, util
+from decorated.util.remove_extra_args import RemoveExtraArgs
 from six import with_metaclass
 import doctest
 
@@ -29,11 +30,12 @@ class Event(with_metaclass(EventMetaType, Function)):
     def _call(self, *args, **kw):
         ret = super(Event, self)._call(*args, **kw)
         if ENABLED:
-            if self._condition(ret, *args, **kw):
-                self._trigger_listeners(ret, *args, **kw)
+            values = self._get_field_values(ret, *args, **kw)
+            if self._condition(**values):
+                self._trigger_listeners(values)
         return ret
     
-    def _condition(self, ret, *args, **kw):
+    def _condition(self):
         return True
     
     def _decorate(self, func):
@@ -42,19 +44,27 @@ class Event(with_metaclass(EventMetaType, Function)):
         type(self)._sources.append(self)
         return self
     
-    def _trigger_listeners(self, ret, *args, **kw):
+    def _get_field_values(self, ret, *args, **kw):
+        values = self._resolve_args(*args, **kw)
+        values = {k: v for k, v in values.items() if k in self.fields}
         if self.ret_field:
-            kw[self.ret_field] = ret
+            values[self.ret_field] = ret
+        return values
+    
+    def _init(self):
+        super(Event, self)._init()
+        self._condition = RemoveExtraArgs(self._condition)
+    
+    def _trigger_listeners(self, values):
         for listener in type(self)._after_listeners:
-            d = listener._resolve_args(*args, **kw)
-            listener._call(**d)
+            listener._call(**values)
             
     def _validate(self):
         for field in self.fields:
             if field not in self.params:
                 raise EventError('Missing field "%s" in "%s".' % (field, type(self).name))
         
-class EventListener(Function):
+class EventListener(RemoveExtraArgs):
     def _call(self, *args, **kw):
         if not ENABLED:
             return super(EventListener, self)._call(*args, **kw)

@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-from decorated.util import events
 from decorated.util.events import Event, EventError
 from unittest.case import TestCase
 
 class FooEvent(Event):
-    name = 'foo'
     fields = ('a', 'b')
     ret_field = 'z'
     
@@ -98,8 +96,8 @@ class CallTest(EventTest):
     def test_conditional(self):
         # set up
         class ConditionalEvent(FooEvent):
-            def _condition(self, ret, *args, **kw):
-                return ret == 3
+            def _condition(self, z):
+                return z == 3
         called = set()
         @ConditionalEvent
         def foo(a, b):
