@@ -44,7 +44,7 @@ Now if you use Function to implement the decorator, it will be something like th
 
 The Function class make sure both _init and _call are called in all situations.
 
-Access to Arguments
+Accessing Arguments
 -------------------
 
 Another common issue with decorators is accessing arguments of the target function. For example:
@@ -136,6 +136,7 @@ events
 This is a simple yet powerful event mechanism.
 
 	from decorated import Event
+	from decorated.util import events
 	
 	class foo_event(Event):
 	    fields = ('id', 'name')
@@ -154,5 +155,18 @@ This is a simple yet powerful event mechanism.
 	def after_foo(result):
 	    print('this is called after foo')
 	    print('the result of foo is %s' % result)
+	    
+	# this will load all modules under the specified package
+	# so that decorator within these modules can actually take effect
+	# you can also init with multi packages: events.init(['package1', 'package2'])
+	events.init('your_package_name')
 
 In a large system, the event source foo and the event listener before_foo & after_foo are usually defined in different modules to achieve loose coupling.
+
+You can combine different decorators to achieve more complex functions. For example:
+
+	@foo_event.before
+	@conditional(condition='id < 0')
+	def before_foo():
+	    print('bad id, should be non-negative')
+	    

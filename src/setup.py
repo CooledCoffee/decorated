@@ -19,6 +19,9 @@ setup(
     install_requires=[
         'six',
     ],
-    packages=['decorated'],
+    packages=[
+        'decorated',
+        'decorated.util'
+    ],
     url='https://github.com/CooledCoffee/decorated/',
 )
