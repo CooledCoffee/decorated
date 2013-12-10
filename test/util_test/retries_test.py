@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
-from decorated.util.retries import retries
+from decorated.util.retries import Retries
 from unittest.case import TestCase
 
 class RetriesTest(TestCase):
     def test_success_at_first(self):
-        @retries(3)
+        @Retries(3)
         def foo():
             return 1
         result = foo()
         self.assertEqual(1, result)
         
     def test_success_after_retry(self):
-        @retries(3)
+        @Retries(3)
         def foo():
             foo.times += 1
             if foo.times == 3:
@@ -23,7 +23,7 @@ class RetriesTest(TestCase):
         self.assertEqual(1, result)
         
     def test_all_failed(self):
-        @retries(3)
+        @Retries(3)
         def foo():
             foo.times += 1
             raise Exception('Failed at retry %d.' % foo.times)
