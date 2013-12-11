@@ -48,44 +48,6 @@ class TargetTest(TestCase):
         target = bar.target()
         self.assertTrue(inspect.isfunction(target))
         
-class GetAttrTest(TestCase):
-    def test_found_in_decorator(self):
-        class FooFunction(Function):
-            def _init(self):
-                self.foo = 'foo'
-                
-            def bar(self):
-                return 'bar'
-        @FooFunction
-        def foo():
-            pass
-        self.assertEqual('foo', foo.foo)
-        self.assertEqual('bar', foo.bar())
-        
-    def test_found_in_target(self):
-        def foo():
-            pass
-        foo.foo = 'foo'
-        foo.bar = lambda: 'bar'
-        foo = Function(foo)
-        self.assertEqual('foo', foo.foo)
-        self.assertEqual('bar', foo.bar())
-        
-    def test_not_found(self):
-        @Function
-        def foo():
-            pass
-        with self.assertRaises(AttributeError):
-            foo.foo
-        with self.assertRaises(AttributeError):
-            foo.bar()
-            
-    def test_not_decorated(self):
-        with self.assertRaises(AttributeError):
-            Function().foo
-        with self.assertRaises(AttributeError):
-            Function().bar()
-        
 class StrTest(TestCase):
     def test(self):
         s = str(foo)

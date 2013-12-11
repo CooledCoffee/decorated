@@ -1,11 +1,12 @@
 # -*- coding: UTF-8 -*-
+from decorated.base.proxy import Proxy
 import doctest
 import functools
 import inspect
 
 WRAPPER_ASSIGNMENTS = ('__module__', '__name__', '__doc__', '__code__', 'func_code')
 
-class Function(object):
+class Function(Proxy):
     def __init__(self, *args, **kw):
         self.params = None
         self.required_params = None
@@ -29,16 +30,6 @@ class Function(object):
         else:
             # access in static way (e.g., Foo.bar)
             return self
-        
-    def __getattr__(self, name):
-        if name in self.__dict__:
-            return self.__dict__[name]
-        else:
-            target = self.__dict__.get('_func')
-            if target:
-                return getattr(target, name)
-            else:
-                raise AttributeError('%s object has no attribute "foo", and target is not available.' % type(self))
     
     def __str__(self):
         return '<Function %s.%s>' % (self._func.__module__, self.__name__)
@@ -84,7 +75,7 @@ class Function(object):
         self.params = tuple(self.params)
         self.required_params = tuple(self.required_params)
         self.optional_params = tuple(self.optional_params)
-            
+        
     def _resolve_args(self, *args, **kw):
         d = {name: default for name, default in self.optional_params}
         for param, arg in zip(self.params, args):
@@ -95,6 +86,9 @@ class Function(object):
                 raise Exception('Missing argument "%s" for %s.' % (name, str(self)))
         d = {k: v for k, v in d.items() if k in self.params}
         return d
+    
+    def _target(self):
+        return self._func
     
 def PartialFunction(func, init_args=(), init_kw=None, call_args=(), call_kw=None):
     if init_kw is None:
