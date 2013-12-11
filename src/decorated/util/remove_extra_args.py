@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from decorated.function import Function
+from decorated.base.function import Function
 
 class RemoveExtraArgs(Function):
     def _call(self, *args, **kw):

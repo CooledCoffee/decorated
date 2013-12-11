@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from decorated.function import Function, PartialFunction
+from decorated.base.function import Function, PartialFunction
 from unittest.case import TestCase
 
 def foo(d, e, f=None):

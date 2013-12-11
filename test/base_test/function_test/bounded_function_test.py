@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-from decorated.function import Function
+from decorated.base.function import Function
 from unittest.case import TestCase
 
 class MethodTest(TestCase):

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from decorated.function import Function
+from decorated.base.function import Function
 from unittest.case import TestCase
 import inspect
 
@@ -89,7 +89,7 @@ class GetAttrTest(TestCase):
 class StrTest(TestCase):
     def test(self):
         s = str(foo)
-        self.assertEquals('<Function function_test.function_test.foo>', s)
+        self.assertEquals('<Function base_test.function_test.function_test.foo>', s)
 
 class ResolveArgsTest(TestCase):
     def test_simple(self):
