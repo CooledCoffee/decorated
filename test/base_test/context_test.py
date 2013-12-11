@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: UTF-8 -*-
 from decorated.base.context import ctx, Context
 from unittest.case import TestCase
 
@@ -17,6 +17,29 @@ class WithTest(TestCase):
         with self.assertRaises(Exception):
             ctx.path
             
+    def test_multi_levels(self):
+        with Context(a=1, _a=1):
+            self.assertEquals(1, ctx.a)
+            self.assertEquals(1, ctx._a)
+            with Context(b=2, _b=2):
+                self.assertEquals(1, ctx.a)
+                self.assertEquals(2, ctx.b)
+                self.assertEquals(2, ctx._b)
+                with self.assertRaises(AttributeError):
+                    ctx._a
+            self.assertEquals(1, ctx.a)
+            self.assertEquals(1, ctx._a)
+            with self.assertRaises(AttributeError):
+                ctx.b
+                
+    def test_error_in_pre_actions(self):
+        def _error():
+            raise Exception()
+        with self.assertRaises(Exception):
+            with Context():
+                ctx.register_pre_action(_error)
+        self.assertIsNone(Context._CURRENT_CONTEXT.get())
+        
 class CtxTest(TestCase):
     def test_get(self):
         with Context(a=1):

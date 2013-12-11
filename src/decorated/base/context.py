@@ -7,6 +7,14 @@ import doctest
 class Context(Dict):
     _CURRENT_CONTEXT = ThreadLocal()
     
+    def __init__(self, **kw):
+        self._parent = Context._CURRENT_CONTEXT.get()
+        fields = self._parent.dict() if self._parent else {}
+        fields.update(kw)
+        super(Context, self).__init__(**fields)
+        self._pre_actions = []
+        self._post_actions = []
+        
     @staticmethod
     def current():
         ctx = Context._CURRENT_CONTEXT.get()
@@ -15,27 +23,25 @@ class Context(Dict):
         else:
             raise ContextError('Context should be set first.')
         
-    def __init__(self, **kw):
-        super(Context, self).__init__(**kw)
-        self._old_ctx = None
-        
     def __enter__(self):
-        self._old_ctx = Context._CURRENT_CONTEXT.get()
         Context._CURRENT_CONTEXT.set(self)
         return self
     
     def __exit__(self, error_type, error_value, traceback):
-        Context._CURRENT_CONTEXT.set(self._old_ctx)
-        
+        Context._CURRENT_CONTEXT.set(self._parent)
+                
     def dict(self):
         '''
-        >>> ctx = Context(path='/test')
-        >>> ctx.dict()
-        {'path': '/test'}
+        >>> ctx = Context(a=1, b=2, _c=3)
+        >>> d = ctx.dict()
+        >>> d['a']
+        1
+        >>> d['b']
+        2
+        >>> '_c' in d
+        False
         '''
-        data = dict(self)
-        del data['_old_ctx']
-        return data
+        return Dict({k: v for k, v in self.items() if not k.startswith('_')})
         
 class ContextProxy(Proxy):
     def __init__(self):
