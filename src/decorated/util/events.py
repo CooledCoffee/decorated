@@ -33,13 +33,24 @@ class Event(with_metaclass(EventMetaType, Function)):
     fields = ()
     ret_field = None
     
+    @classmethod
+    def fire(cls, data):
+        if _ENABLED:
+            cls._execute_before_listeners(data)
+            cls._execute_after_listeners(data)
+    
     def _call(self, *args, **kw):
         if not _ENABLED:
             return super(Event, self)._call(*args, **kw)
         
-        self._trigger_before_listeners(*args, **kw)
+        data = self._get_field_values(None, *args, **kw)
+        self._execute_before_listeners(data)
+        
         ret = super(Event, self)._call(*args, **kw)
-        self._trigger_after_listeners(ret, *args, **kw)
+        
+        data = self._get_field_values(ret, *args, **kw)
+        self._execute_after_listeners(data)
+        
         return ret
     
     def _decorate(self, func):
@@ -55,15 +66,15 @@ class Event(with_metaclass(EventMetaType, Function)):
             values[self.ret_field] = ret
         return values
     
-    def _trigger_after_listeners(self, ret, *args, **kw):
-        values = self._get_field_values(ret, *args, **kw)
-        for listener in type(self)._after_listeners:
-            listener._call(**values)
+    @classmethod
+    def _execute_after_listeners(cls, data):
+        for listener in cls._after_listeners:
+            listener._call(**data)
             
-    def _trigger_before_listeners(self, *args, **kw):
-        values = self._get_field_values(None, *args, **kw)
-        for listener in type(self)._before_listeners:
-            listener._call(**values)
+    @classmethod
+    def _execute_before_listeners(cls, data):
+        for listener in cls._before_listeners:
+            listener._call(**data)
             
     def _validate(self):
         for field in self.fields:

@@ -102,3 +102,18 @@ class CallTest(EventTest):
         foo(1, 2)
         self.assertEquals([1, 1, 3], self.called)
         
+class FireTest(EventTest):
+    def test(self):
+        self.called = []
+        @FooEvent.before
+        def before_foo(a):
+            self.called.append(a)
+        @FooEvent.after
+        def after_foo1(a):
+            self.called.append(a)
+        @FooEvent.after
+        def after_foo2(z):
+            self.called.append(z)
+        FooEvent.fire({'a': 1, 'z': 3})
+        self.assertEquals([1, 1, 3], self.called)
+        
