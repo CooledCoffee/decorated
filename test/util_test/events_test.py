@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from decorated.util import events
 from decorated.util.events import Event, EventError
 from unittest.case import TestCase
 
@@ -9,8 +10,13 @@ class FooEvent(Event):
 class EventTest(TestCase):
     def setUp(self):
         super(EventTest, self).setUp()
+        events._ENABLED = True
         FooEvent._sources = []
         FooEvent._after_listeners = []
+        
+    def tearDown(self):
+        events._ENABLED = False
+        super(EventTest, self).tearDown()
 
 class DecorateTest(EventTest):
     def test(self):

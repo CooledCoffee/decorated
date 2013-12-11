@@ -4,8 +4,7 @@ from decorated.util.remove_extra_args import RemoveExtraArgs
 from six import with_metaclass
 import doctest
 
-ENABLED = True
-_INITED = False
+_ENABLED = False
 
 class EventMetaType(type):
     def __init__(self, name, bases, attrs):
@@ -35,7 +34,7 @@ class Event(with_metaclass(EventMetaType, Function)):
     ret_field = None
     
     def _call(self, *args, **kw):
-        if not ENABLED:
+        if not _ENABLED:
             return super(Event, self)._call(*args, **kw)
         
         values = self._get_field_values(None, *args, **kw)
@@ -89,7 +88,7 @@ class Event(with_metaclass(EventMetaType, Function)):
         
 class EventListener(RemoveExtraArgs):
     def _call(self, *args, **kw):
-        if not ENABLED:
+        if not _ENABLED:
             return super(EventListener, self)._call(*args, **kw)
         return super(EventListener, self)._call(*args, **kw)
         
@@ -118,11 +117,11 @@ class BeforeEventListener(EventListener):
 class EventError(Exception): pass
 
 def init(packages):
-    global _INITED
-    if _INITED:
+    global _ENABLED
+    if _ENABLED:
         return
     util.load_modules(packages)
-    _INITED = True
+    _ENABLED = True
 
 def _get_full_name(func):
     '''
