@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from decorated.util.conditional import Conditional
+from decorated.decorators.conditional import Conditional
 from unittest.case import TestCase
 
 class ConditionalTest(TestCase):

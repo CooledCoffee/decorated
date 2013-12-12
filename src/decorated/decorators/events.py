@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from decorated.base.function import Function
-from decorated.util.remove_extra_args import RemoveExtraArgs
+from decorated.decorators.remove_extra_args import RemoveExtraArgs
 from six import with_metaclass
 import doctest
 

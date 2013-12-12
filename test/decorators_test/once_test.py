@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from decorated.base.context import Context
-from decorated.util.once import Once, OnceSession
+from decorated.decorators.once import Once, OnceSession
 from unittest.case import TestCase
 
 class OnceTest(TestCase):

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from decorated.util.remove_extra_args import RemoveExtraArgs
+from decorated.decorators.remove_extra_args import RemoveExtraArgs
 from unittest.case import TestCase
 
 @RemoveExtraArgs

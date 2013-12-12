@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from decorated.util import events
-from decorated.util.events import Event, EventError
+from decorated.decorators import events
+from decorated.decorators.events import Event, EventError
 from unittest.case import TestCase
 
 class FooEvent(Event):
