@@ -1,3 +1,12 @@
+Installation
+============
+
+pip install decorated
+
+or
+
+easy_install decorated
+
 Introduction
 ============
 
@@ -86,15 +95,6 @@ The situation is even more complicated if the target function is encapsured by m
 	    
 Now it is extremely difficult for a traditional @cache to get the name argument.
 However, if all decorators (@cache, @another\_decorator\_1, @another\_decorator\_2 & @another\_decorator\_3) are derived from the Function class, you won't need to change any code for the cache decorator.
-
-Installtion
-===========
-
-pip install decorated
-
-or
-
-easy_install decorated
 
 Decorators
 ==========
