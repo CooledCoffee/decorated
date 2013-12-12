@@ -68,8 +68,36 @@ The \_resolve_args method in the Function class will do it for you:
 	        # below is the normal caching logic
 	        ...
 	        
-Utilities
-=========
+Multi-level Decorators
+----------------------
+
+The situation is even more complicated if the target function is encapsured by multi decorators:
+
+	@cache
+	@another_decorator_1
+	def foo(name):
+	    pass
+		
+	@cache
+	@another_decorator_2
+	@another_decorator_3
+	def bar(id, name):
+	    pass
+	    
+Now it is extremely difficult for a traditional @cache to get the name argument.
+However, if all decorators (@cache, @another\_decorator\_1, @another\_decorator\_2 & @another\_decorator\_3) are derived from the Function class, you won't need to change any code for the cache decorator.
+
+Installtion
+===========
+
+pip install decorated
+
+or
+
+easy_install decorated
+
+Decorators
+==========
 
 Decorated comes with some common decorators.
 
@@ -100,6 +128,49 @@ conditional
 	    pass
 	    
 All these 4 forms have the same effect. The save function will be called only when amount is not 0.
+
+once
+----
+
+To make sure a function is called only once:
+
+	from decorated import once
+	
+	@once
+	def init():
+	    pass
+	    
+	init() # will call the function
+	init() # will be ignored
+	
+To make sure a function is called only once for a specified value:
+
+	from decorated import once
+	
+	@once('(a, b)')
+	def add(a, b, c):
+		print(c)
+	    return a + b
+	    
+	add(1, 2, 3) # will call the function
+	add(1, 3, 4) # will call the function because the key "(a, b)" if different
+	add(1, 2, 4) # will not call the function because the key "(a, b)" if the same as the first call. instead, the previous result will be returned directly
+	
+To make sure a function is called only once for a given session:
+
+	from decorated import once, OnceSession
+	
+	@once
+	def check_is_logined():
+	    pass
+	    
+	with OnceSession():
+	    check_is_logined() # will call the function
+	    check_is_logined() # will be ignored
+	with OnceSession():
+	    check_is_logined() # will call the function because it is called within a different session from the first call
+	
+This is useful in a web application where you may want a certain function be called only once for a single request.
 
 remove\_extra\_args
 -------------------
@@ -163,10 +234,32 @@ This is a simple yet powerful event mechanism.
 
 In a large system, the event source foo and the event listener before_foo & after_foo are usually defined in different modules to achieve loose coupling.
 
+Combination of Decorators
+=========================
+
 You can combine different decorators to achieve more complex functions. For example:
 
+	@once
+	@foo_event
+	@retries(3)
+	def foo(id):
+	    pass
+	    
 	@foo_event.before
 	@conditional(condition='id < 0')
 	def before_foo():
 	    print('bad id, should be non-negative')
 	    
+Loggingd
+========
+
+Loggingd (<a href="https://github.com/CooledCoffee/loggingd" target="_blank">https://github.com/CooledCoffee/loggingd</a>) is a logging framework based on decorated. You can log using decorators.
+
+	from loggingd import log_enter, log_return, log_error
+	
+	@log_enter('[DEBUG] Calculating {a} / {b} ...')
+	@log_return('Result is {ret}.')
+	@log_error('[WARN] Failed to calc.', exc_info=True)
+	def divide(a, b):
+        return a / b
+        
