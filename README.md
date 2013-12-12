@@ -253,7 +253,7 @@ You can combine different decorators to achieve more complex functions. For exam
 Loggingd
 ========
 
-Loggingd (<a href="https://github.com/CooledCoffee/loggingd" target="_blank">https://github.com/CooledCoffee/loggingd</a>) is a logging framework based on decorated. You can log using decorators.
+Loggingd (https://github.com/CooledCoffee/loggingd) is a logging framework based on decorated. You can log using decorators.
 
 	from loggingd import log_enter, log_return, log_error
 	
