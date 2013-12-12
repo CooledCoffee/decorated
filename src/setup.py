@@ -21,7 +21,8 @@ setup(
     ],
     packages=[
         'decorated',
-        'decorated.util'
+        'decorated.base',
+        'decorated.decorators'
     ],
     url='https://github.com/CooledCoffee/decorated/',
 )
