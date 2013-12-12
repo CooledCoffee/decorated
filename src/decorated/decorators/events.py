@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+from decorated import util
 from decorated.base.function import Function
+from decorated.decorators.once import Once
 from decorated.decorators.remove_extra_args import RemoveExtraArgs
 from six import with_metaclass
 import doctest
@@ -111,11 +113,9 @@ class BeforeEventListener(EventListener):
     
 class EventError(Exception): pass
 
+@Once
 def init(packages):
-    from decorated import util
     global _ENABLED
-    if _ENABLED:
-        return
     util.load_modules(packages)
     _ENABLED = True
 
