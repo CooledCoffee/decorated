@@ -32,3 +32,14 @@ class RetriesTest(TestCase):
             foo()
         self.assertEqual('Failed at retry 3.', str(err.exception))
         
+    def test_invalid_times(self):
+        with self.assertRaises(Exception):
+            @Retries(0)
+            def foo():
+                pass
+        with self.assertRaises(Exception):
+            @Retries(-1)
+            def bar():
+                pass
+            
+            

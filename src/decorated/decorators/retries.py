@@ -4,6 +4,8 @@ import time
 
 class Retries(Function):
     def _init(self, times, delay=0):
+        if times <= 0:
+            raise Exception('Times should be positive.')
         self._times = times
         self._delay = delay
         
