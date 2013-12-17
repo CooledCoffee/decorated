@@ -129,6 +129,33 @@ conditional
 	    
 All these 4 forms have the same effect. The save function will be called only when amount is not 0.
 
+instantiate
+-----------
+
+Suppose @cron is a decorator that calls the target every minute. Instead of writing:
+
+	class Task(object):
+	    def run(self)
+	        pass
+		    
+	@cron('* * * * *')
+	def run():
+	    Task().run()
+	    
+You can now write:
+
+	from decorated import instantiate
+	
+	@cron('* * * * *')
+	@instantiate(method='run')
+	class Task(object):
+	    def run(self)
+	        pass
+	        
+The @instantiate decorator creates a wrapper function that instantiates the class and executes the specified method.
+The default method is \_\_call\_\_.
+Note that you no longer have access to the Task class after this.
+
 once
 ----
 
