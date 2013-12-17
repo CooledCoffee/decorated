@@ -8,12 +8,13 @@ class Retries(Function):
         self._delay = delay
         
     def _call(self, *args, **kw):
-        for _ in range(self._times):
+        for i in range(self._times):
             try:
                 return super(Retries, self)._call(*args, **kw)
             except Exception as e:
                 last_error = e
-                time.sleep(self._delay)
+                if i != self._times:
+                    time.sleep(self._delay)
         else:
             raise last_error
         
