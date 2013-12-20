@@ -3,44 +3,69 @@ import doctest
 
 class Dict(dict):
     '''
-    A Dict object is like a dictionary except `obj.foo` can be used
-    in addition to `obj['foo']`.
+    >>> d = Dict(a=1)
     
-    >>> o = Dict(a=1)
-    >>> o.a
+    >>> 'a' in d
+    True
+    >>> d['a']
     1
-    >>> o['a']
+    >>> d.a
     1
-    >>> o.a = 2
-    >>> o['a']
+    
+    >>> d.a = 2
+    >>> d['a']
     2
-    >>> del o.a
-    >>> o.a
+    >>> d.a
+    2
+    
+    >>> d['b'] = 2
+    >>> 'b' in d
+    True
+    >>> d['b']
+    2
+    >>> d.b
+    2
+    
+    >>> d.c = 3
+    >>> 'c' in d
+    True
+    >>> d['c']
+    3
+    >>> d.c
+    3
+    
+    >>> del d.c
+    >>> 'c' in d
+    False
+    >>> d['c']
     Traceback (most recent call last):
     ...
-    AttributeError: 'a'
-    >>> del o.b
+    KeyError: 'c'
+    >>> d.c
     Traceback (most recent call last):
     ...
-    AttributeError: 'b'
+    AttributeError: 'c'
+    
+    >>> del d.d
+    Traceback (most recent call last):
+    ...
+    AttributeError: 'd'
     '''
-    def __getattr__(self, key):
+    def __getattr__(self, name):
         try:
-            return self[key]
-        except KeyError as k:
-            raise AttributeError(k)
+            return self[name]
+        except KeyError as e:
+            raise AttributeError(str(e))
     
-    def __setattr__(self, key, value): 
-        self[key] = value
+    def __setattr__(self, name, value): 
+        self[name] = value
     
-    def __delattr__(self, key):
+    def __delattr__(self, name):
         try:
-            del self[key]
-        except KeyError as k:
-            raise AttributeError(k)
+            del self[name]
+        except KeyError as e:
+            raise AttributeError(str(e))
         
-NOT_SET = object()
-
 class DefaultDict(Dict):
     '''
     >>> d = DefaultDict(lambda k: 2 * k)
