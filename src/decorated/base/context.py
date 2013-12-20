@@ -5,42 +5,22 @@ from decorated.base.thread_local import ThreadLocal
 import doctest
 
 class Context(Dict):
-    _CURRENT_CONTEXT = ThreadLocal()
+    _current = ThreadLocal()
     
     def __init__(self, **kw):
-        self._parent = Context._CURRENT_CONTEXT.get()
+        self._parent = Context._current.get()
         fields = self._parent.dict() if self._parent else {}
         fields.update(kw)
         super(Context, self).__init__(**fields)
-        self._pre_actions = []
-        self._post_actions = []
-        
-    @staticmethod
-    def current():
-        ctx = Context._CURRENT_CONTEXT.get()
-        if ctx:
-            return ctx
-        else:
-            raise ContextError('Context should be set first.')
         
     def __enter__(self):
-        Context._CURRENT_CONTEXT.set(self)
+        Context._current.set(self)
         return self
     
     def __exit__(self, error_type, error_value, traceback):
-        Context._CURRENT_CONTEXT.set(self._parent)
-                
+        Context._current.set(self._parent)
+        
     def dict(self):
-        '''
-        >>> ctx = Context(a=1, b=2, _c=3)
-        >>> d = ctx.dict()
-        >>> d['a']
-        1
-        >>> d['b']
-        2
-        >>> '_c' in d
-        False
-        '''
         return Dict({k: v for k, v in self.items() if not k.startswith('_')})
         
 class ContextProxy(Proxy):
@@ -56,10 +36,14 @@ class ContextProxy(Proxy):
             self.__dict__[name] = value
     
     def get(self):
-        return Context.current()
+        return self._target()
         
     def _target(self):
-        return Context.current()
+        ctx = Context._current.get()
+        if ctx:
+            return ctx
+        else:
+            raise ContextError('Context should be set first.')
     
 class ContextError(Exception):
     pass
