@@ -8,10 +8,8 @@ class Context(Dict):
     _current = ThreadLocal()
     
     def __init__(self, **kw):
+        super(Context, self).__init__(**kw)
         self._parent = Context._current.get()
-        fields = self._parent.dict() if self._parent else {}
-        fields.update(kw)
-        super(Context, self).__init__(**fields)
         
     def __enter__(self):
         Context._current.set(self)
@@ -20,8 +18,19 @@ class Context(Dict):
     def __exit__(self, error_type, error_value, traceback):
         Context._current.set(self._parent)
         
+    def __getattr__(self, key):
+        try:
+            return super(Context, self).__getattr__(key)
+        except AttributeError as e:
+            try:
+                return getattr(self._parent, key)
+            except AttributeError:
+                raise e
+        
     def dict(self):
-        return Dict({k: v for k, v in self.items() if not k.startswith('_')})
+        data = self._parent.dict() if self._parent else Dict()
+        data.update({k: v for k, v in self.items() if not k.startswith('_')})
+        return data
         
 class ContextProxy(Proxy):
     def __init__(self):
