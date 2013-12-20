@@ -5,18 +5,26 @@ from unittest.case import TestCase
 class WithTest(TestCase):
     def test_single_level(self):
         with Context(path='/test'):
-            self.assertEquals('/test', Context._current.get().path)
+            self.assertEqual('/test', Context._current.get().path)
             
     def test_multi_levels_data(self):
         with Context(a=1, b=2) as ctx1:
-            self.assertEquals(1, ctx1.a)
-            self.assertEquals(2, ctx1.b)
+            self.assertIn('a', ctx1)
+            self.assertEqual(1, ctx1.a)
+            self.assertIn('b', ctx1)
+            self.assertEqual(2, ctx1.b)
             with Context(b=3, c=4) as ctx2:
-                self.assertEquals(1, ctx2.a)
-                self.assertEquals(3, ctx2.b)
+                self.assertIn('a', ctx2)
+                self.assertEqual(1, ctx2.a)
+                self.assertIn('b', ctx2)
+                self.assertEqual(3, ctx2.b)
+                self.assertIn('c', ctx2)
                 self.assertEqual(4, ctx2.c)
-            self.assertEquals(1, ctx1.a)
-            self.assertEquals(2, ctx1.b)
+            self.assertIn('a', ctx1)
+            self.assertEqual(1, ctx1.a)
+            self.assertIn('b', ctx1)
+            self.assertEqual(2, ctx1.b)
+            self.assertNotIn('c', ctx1)
             with self.assertRaises(AttributeError):
                 ctx1.c
                 

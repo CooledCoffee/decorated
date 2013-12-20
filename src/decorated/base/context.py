@@ -11,6 +11,14 @@ class Context(Dict):
         super(Context, self).__init__(**kw)
         self._parent = Context._current.get()
         
+    def __contains__(self, name):
+        if super(Context, self).__contains__(name):
+            return True
+        elif self._parent and self._parent.__contains__(name):
+            return True
+        else:
+            return False
+        
     def __enter__(self):
         Context._current.set(self)
         return self
@@ -18,15 +26,15 @@ class Context(Dict):
     def __exit__(self, error_type, error_value, traceback):
         Context._current.set(self._parent)
         
-    def __getattr__(self, key):
+    def __getattr__(self, name):
         try:
-            return super(Context, self).__getattr__(key)
+            return super(Context, self).__getattr__(name)
         except AttributeError as e:
             try:
-                return getattr(self._parent, key)
+                return getattr(self._parent, name)
             except AttributeError:
                 raise e
-        
+            
     def dict(self):
         data = self._parent.dict() if self._parent else Dict()
         data.update({k: v for k, v in self.items() if not k.startswith('_')})
