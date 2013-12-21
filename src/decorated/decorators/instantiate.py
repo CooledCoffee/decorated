@@ -3,6 +3,7 @@ from decorated.base.function import Function
 
 class Instantiate(Function):
     def _decorate(self, cls):
+        self.class_ = cls
         def _func(*args, **kw):
             obj = cls()
             method = getattr(obj, self._method)
