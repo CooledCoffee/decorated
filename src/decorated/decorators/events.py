@@ -36,8 +36,9 @@ class Event(with_metaclass(EventMetaType, Function)):
     ret_field = None
     
     @classmethod
-    def fire(cls, data):
+    def fire(cls, data=None):
         if _ENABLED:
+            data = data or {}
             cls._execute_before_listeners(data)
             cls._execute_after_listeners(data)
     
