@@ -6,6 +6,7 @@ from decorated.decorators.instantiate import Instantiate
 from decorated.decorators.once import Once, OnceSession
 from decorated.decorators.remove_extra_args import RemoveExtraArgs
 from decorated.decorators.retries import Retries
+from decorated.decorators.synchronized import Synchronized
 
 Function = Function
 PartialFunction = PartialFunction
@@ -18,3 +19,4 @@ once = Once
 OnceSession = OnceSession
 remove_extra_args = RemoveExtraArgs
 retries = Retries
+synchronized = Synchronized
