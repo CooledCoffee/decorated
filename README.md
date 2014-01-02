@@ -228,6 +228,25 @@ retries
 
 The retry decorator retries its target (the download function) on error. Maximum retry times is 3 with 10 seconds interval between each retry. If the all 3 times fail, the last error is raised.
 
+synchronized
+------------
+
+The effect of @synchronized is similar to its counter-part in java, meaning the functions foo & bar will never be called by two or more threads simultaneously.
+You can substitute MemoryLock for FileLock (only works on linux) to synchronize among multi processes.
+You can also implement distributed locks using mysql, zookeeper, etc.
+
+	from decorated.decorators.synchronized import MemoryLock
+	
+	lock = MemoryLock()
+	
+	@synchronized(lock)
+	def foo():
+	    pass
+	    
+	@synchronized(lock)
+	def bar():
+	    pass
+	    
 events
 ------
 
