@@ -53,16 +53,16 @@ class Dict(dict):
     '''
     def __getattr__(self, name):
         try:
-            return self[name]
+            return super(Dict, self).__getitem__(name)
         except KeyError as e:
             raise AttributeError(str(e))
     
     def __setattr__(self, name, value): 
-        self[name] = value
+        super(Dict, self).__setitem__(name, value)
     
     def __delattr__(self, name):
         try:
-            del self[name]
+            super(Dict, self).__delitem__(name)
         except KeyError as e:
             raise AttributeError(str(e))
         

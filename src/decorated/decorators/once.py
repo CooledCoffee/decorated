@@ -7,12 +7,11 @@ class Once(Function):
         key = self._evaluate(self._key, *args, **kw)
         key = (self._func, key)
         try:
-            session = ctx.get()
-            if 'once_results' not in session:
-                session = _DEFAULT_SESSION
+            results = ctx.once_results
         except ContextError:
-            session = _DEFAULT_SESSION
-        results = session.once_results
+            results = _DEFAULT_SESSION.once_results
+        except AttributeError:
+            results = _DEFAULT_SESSION.once_results
         if key in results:
             result = results[key]
         else:

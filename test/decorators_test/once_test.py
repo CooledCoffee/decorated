@@ -3,7 +3,7 @@ from decorated.base.context import Context
 from decorated.decorators.once import Once, OnceSession
 from unittest.case import TestCase
 
-class OnceTest(TestCase):
+class DefaultSessionTest(TestCase):
     def test_no_key(self):
         @Once
         def foo(a, b):
@@ -29,7 +29,8 @@ class OnceTest(TestCase):
         self.assertEqual(3, add(1, 2))
         self.assertEqual(2, mul(1, 2))
         
-    def test_with_session(self):
+class WithSessionTest(TestCase):
+    def test_single_level(self):
         @Once
         def foo(a, b):
             return a + b
@@ -38,7 +39,7 @@ class OnceTest(TestCase):
         with OnceSession():
             self.assertEqual(7, foo(3, 4))
         
-    def test_with_multi_level_context(self):
+    def test_multi_levels(self):
         @Once
         def foo(a, b):
             return a + b
@@ -50,3 +51,11 @@ class OnceTest(TestCase):
                 with Context():
                     self.assertEqual(7, foo(3, 4))
                 
+    def test_context_is_not_session(self):
+        @Once
+        def foo(a, b):
+            return a + b
+        with Context():
+            self.assertEqual(3, foo(1, 2))
+            self.assertEqual(3, foo(3, 4))
+            

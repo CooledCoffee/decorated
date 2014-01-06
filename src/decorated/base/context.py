@@ -12,12 +12,7 @@ class Context(Dict):
         self._parent = Context._current.get()
         
     def __contains__(self, name):
-        if super(Context, self).__contains__(name):
-            return True
-        elif self._parent and self._parent.__contains__(name):
-            return True
-        else:
-            return False
+        raise NotImplementedError()
         
     def __enter__(self):
         Context._current.set(self)
@@ -30,16 +25,25 @@ class Context(Dict):
         try:
             return super(Context, self).__getattr__(name)
         except AttributeError as e:
-            try:
-                return getattr(self._parent, name)
-            except AttributeError:
+            if self._parent:
+                try:
+                    return getattr(self._parent, name)
+                except AttributeError:
+                    raise e
+            else:
                 raise e
+            
+    def __getitem__(self, name):
+        raise NotImplementedError()
             
     def dict(self):
         data = self._parent.dict() if self._parent else Dict()
         data.update({k: v for k, v in self.items() if not k.startswith('_')})
         return data
         
+    def get(self, name, default=None):
+        raise NotImplementedError()
+            
 class ContextProxy(Proxy):
     def __init__(self):
         super(ContextProxy, self).__init__()
