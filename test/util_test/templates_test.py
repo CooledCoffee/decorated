@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from decorated.base.dict import Dict
 from decorated.util import templates
 from decorated.util.templates import StringPart, VariablePart, TemplateError
 from unittest.case import TestCase
@@ -41,4 +42,15 @@ class CompileTest(TestCase):
     def test_missing_var(self):
         with self.assertRaises(TemplateError):
             templates.compile('{d}', ['a', 'b', 'c'])
+    
+class EvalTest(TestCase):
+    def test_succeed(self):
+        template = templates.compile('Calculating {a} + {b} ...', ['a', 'b', 'c'])
+        result = template.eval({'a': 1, 'b': 2, 'c': 3})
+        self.assertEqual('Calculating 1 + 2 ...', result)
+        
+    def test_var_member_not_found(self):
+        template = templates.compile('{user.name}', ['user'])
+        with self.assertRaises(TemplateError):
+            template.eval({'user': Dict(id=1)})
             

@@ -5,8 +5,20 @@ class TemplateError(Exception):
     pass
 
 class Template(object):
-    def __init__(self, parts):
+    def __init__(self, expression, parts):
+        self._expression = expression
         self._parts = parts
+        
+    def eval(self, values):
+        parts = []
+        for p in self._parts:
+            try:
+                part = p.eval(values)
+                part = str(part)
+                parts.append(part)
+            except AttributeError:
+                raise TemplateError('Failed to evaluate expression "%s" in template "%s".' % (p._expression, self._expression))
+        return ''.join(parts)
 
 class Part(object):
     def __init__(self, expression):
@@ -51,7 +63,7 @@ def compile(template, names):
             expression += c
     if expression:
         parts.append(StringPart(expression))
-    return Template(parts)
+    return Template(template, parts)
 
 if __name__ == '__main__':
     doctest.testmod()
