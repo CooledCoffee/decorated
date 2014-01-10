@@ -35,9 +35,13 @@ class CompileTest(TestCase):
         self.assertIsInstance(template._parts[2], VariablePart)
         self.assertEqual('c', template._parts[2]._expression)
         
-    def test_var_member(self):
+    def test_attr(self):
         template = templates.compile('{user.id}', ['user'])
         self.assertEqual('user.id', template._parts[0]._expression)
+        
+    def test_item(self):
+        template = templates.compile('{user["id"]}', ['user'])
+        self.assertEqual('user["id"]', template._parts[0]._expression)
         
     def test_missing_var(self):
         with self.assertRaises(TemplateError):
@@ -49,8 +53,13 @@ class EvalTest(TestCase):
         result = template.eval({'a': 1, 'b': 2, 'c': 3})
         self.assertEqual('Calculating 1 + 2 ...', result)
         
-    def test_var_member_not_found(self):
+    def test_attr_not_found(self):
         template = templates.compile('{user.name}', ['user'])
         with self.assertRaises(TemplateError):
             template.eval({'user': Dict(id=1)})
+            
+    def test_item_not_found(self):
+        template = templates.compile('{user["name"]}', ['user'])
+        with self.assertRaises(TemplateError):
+            template.eval({'user': {'id': 1}})
             

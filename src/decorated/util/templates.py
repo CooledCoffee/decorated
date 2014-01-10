@@ -16,7 +16,7 @@ class Template(object):
                 part = p.eval(values)
                 part = str(part)
                 parts.append(part)
-            except AttributeError:
+            except Exception:
                 raise TemplateError('Failed to evaluate expression "%s" in template "%s".' % (p._expression, self._expression))
         return ''.join(parts)
 
@@ -41,6 +41,8 @@ class VariablePart(Part):
     1
     >>> VariablePart('user.id').eval({'user': Dict(id=1)})
     1
+    >>> VariablePart('user["id"]').eval({'user': {'id': 1}})
+    1
     '''
     def eval(self, variables):
         return eval(self._expression, variables)
@@ -54,7 +56,7 @@ def compile(template, names):
                 parts.append(StringPart(expression))
                 expression = ''
         elif c == '}':
-            variable = expression.split('.', 1)[0]
+            variable = expression.split('.', 1)[0].split('[', 1)[0]
             if not variable in names:
                 raise TemplateError('Unknown variable "%s" in template "%s".' % (expression, template))
             parts.append(VariablePart(expression))
