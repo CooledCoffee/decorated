@@ -4,7 +4,7 @@ from decorated.base.function import Function
 
 class Once(Function):
     def _call(self, *args, **kw):
-        key = self._evaluate(self._key, *args, **kw)
+        key = self._evaluate_expression(self._key, *args, **kw)
         key = (self._func, key)
         try:
             results = ctx.once_results

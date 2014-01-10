@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 from decorated.base.proxy import Proxy
+from decorated.util import templates
 import doctest
 import functools
 import inspect
@@ -40,6 +41,9 @@ class Function(Proxy):
     def _call(self, *args, **kw):
         return self._func(*args, **kw)
     
+    def _compile_template(self, template):
+        return templates.compile(template, self.params)
+    
     def _decorate(self, func):
         self._func = func
         functools.update_wrapper(self, func, WRAPPER_ASSIGNMENTS, updated=())
@@ -52,7 +56,7 @@ class Function(Proxy):
         self._decorate_or_call = self._call
         return self
     
-    def _evaluate(self, expression, *args, **kw):
+    def _evaluate_expression(self, expression, *args, **kw):
         d = self._resolve_args(*args, **kw)
         return eval(expression, d)
         

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from decorated.base.function import Function
+from decorated.util.templates import Template, TemplateError
 from unittest.case import TestCase
 import inspect
 
@@ -98,14 +99,23 @@ class ResolveArgsTest(TestCase):
         self.assertEquals(1, len(d))
         self.assertEquals(1, d['id'])
             
-class EvaluateTest(TestCase):
+class EvaluateExpressionTest(TestCase):
     def test_success(self):
-        result = foo._evaluate('str(id) + "-" + name', 1, name='my name')
+        result = foo._evaluate_expression('str(id) + "-" + name', 1, name='my name')
         self.assertEquals('1-my name', result)
         
     def test_failed(self):
         with self.assertRaises(Exception):
-            foo._evaluate('!@#$%', 1, name='my name')
+            foo._evaluate_expression('!@#$%', 1, name='my name')
+            
+class CompileTemplateTest(TestCase):
+    def test_success(self):
+        template = foo._compile_template('Id is {id}.')
+        self.assertIsInstance(template, Template)
+        
+    def test_failed(self):
+        with self.assertRaises(TemplateError):
+            foo._compile_template('Email is {email}.')
         
 class CallTest(TestCase):
     def test_no_init_arg(self):
