@@ -1,48 +1,52 @@
 # -*- coding: utf-8 -*-
 from decorated.base.function import Function
-from decorated.util import modutil
+from decorated.util import modutil, templates
 
 _ENABLED = True
 
 class BaseDecorator(Function):
-    def _init(self, cache, key):
-        super(BaseDecorator, self)._init()
-        self._cache = cache
-        self._key = key
+    def _call(self, *args, **kw):
+        if _ENABLED:
+            d = dict(self._extra_vars)
+            d.update(self._resolve_args(*args, **kw))
+            key = self._key.eval(d)
+            return self._process(key, *args, **kw)
+        else:
+            return super(BaseDecorator, self)._call(*args, **kw)
         
     def _decorate(self, func):
         super(BaseDecorator, self)._decorate(func)
-        self._key = self._compile_template(self._key)
+        var_names = self.params + tuple(self._extra_vars.keys())
+        self._key = templates.compile(self._key, var_names)
         return self
 
-class Cache(object):
-    def cache(self, key):
-        class Decorator(BaseDecorator):
-            def _call(self, *args, **kw):
-                if _ENABLED:
-                    d = self._resolve_args(*args, **kw)
-                    key = self._key.eval(d)
-                    result = self._cache._get(key)
-                    if result is None:
-                        result = super(Decorator, self)._call(*args, **kw)
-                        self._cache._set(key, result)
-                    return result
-                else:
-                    return super(Decorator, self)._call(*args, **kw)
-        return Decorator(self, key)
+    def _init(self, cache, key, extra_vars=None):
+        super(BaseDecorator, self)._init()
+        self._cache = cache
+        self._key = key
+        self._extra_vars = extra_vars or {}
+        
+    def _process(self, key, *args, **kw):
+        raise NotImplementedError()
     
-    def uncache(self, key):
+class Cache(object):
+    def cache(self, key, **kw):
         class Decorator(BaseDecorator):
-            def _call(self, *args, **kw):
-                if _ENABLED:
-                    d = self._resolve_args(*args, **kw)
-                    key = self._key.eval(d)
-                    result = super(Decorator, self)._call(*args, **kw)
-                    self._cache._delete(key)
-                    return result
-                else:
-                    return super(Decorator, self)._call(*args, **kw)
-        return Decorator(self, key)
+            def _process(self, key, *args, **kw):
+                result = self._cache._get(key)
+                if result is None:
+                    result = Function._call(self, *args, **kw)
+                    self._cache._set(key, result)
+                return result
+        return Decorator(self, key, extra_vars=kw)
+    
+    def uncache(self, key, **kw):
+        class Decorator(BaseDecorator):
+            def _process(self, key, *args, **kw):
+                result = Function._call(self, *args, **kw)
+                self._cache._delete(key)
+                return result
+        return Decorator(self, key, extra_vars=kw)
     
     def _delete(self, key):
         raise NotImplementedError()

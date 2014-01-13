@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from decorated.base.context import Context, ctx
 from decorated.decorators.cache import SimpleCache, LruCache
 from unittest.case import TestCase
 
@@ -21,7 +22,7 @@ class LruCacheTest(TestCase):
         self.assertIsNone(cache._get('a'))
         
 class CacheTest(TestCase):
-    def test(self):
+    def test_simple(self):
         # set up
         cache = SimpleCache()
         @cache.cache('/{id}')
@@ -48,4 +49,19 @@ class CacheTest(TestCase):
         
         self.assertEqual(2, foo(2))
         self.assertEqual(2, len(cache._data))
+        
+    def test_extra_vars(self):
+        # set up
+        cache = SimpleCache()
+        @cache.cache('/{a}/{ctx.b}', a=1, ctx=ctx)
+        def foo():
+            pass
+        @cache.uncache('/{a}/{ctx.b}', a=1, ctx=ctx)
+        def unfoo():
+            pass
+        with Context(b=2):
+            foo()
+            self.assertIn('/1/2', cache._data)
+            unfoo()
+            self.assertNotIn('/1/2', cache._data)
         
