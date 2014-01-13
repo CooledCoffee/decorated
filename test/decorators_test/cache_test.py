@@ -4,21 +4,21 @@ from unittest.case import TestCase
 
 class SimpleCacheTest(TestCase):
     def test(self):
-        self.cache = SimpleCache()
-        self.assertIsNone(self.cache._get('a'))
-        self.cache._set('a', 1)
-        self.assertEquals(1, self.cache._get('a'))
-        self.cache._delete('a')
-        self.assertIsNone(self.cache._get('a'))
+        cache = SimpleCache()
+        self.assertIsNone(cache._get('a'))
+        cache._set('a', 1)
+        self.assertEquals(1, cache._get('a'))
+        cache._delete('a')
+        self.assertIsNone(cache._get('a'))
 
 class LruCacheTest(TestCase):
     def test(self):
-        self.cache = LruCache()
-        self.assertIsNone(self.cache._get('a'))
-        self.cache._set('a', 1)
-        self.assertEquals(1, self.cache._get('a'))
-        self.cache._delete('a')
-        self.assertIsNone(self.cache._get('a'))
+        cache = LruCache()
+        self.assertIsNone(cache._get('a'))
+        cache._set('a', 1)
+        self.assertEquals(1, cache._get('a'))
+        cache._delete('a')
+        self.assertIsNone(cache._get('a'))
         
 class CacheTest(TestCase):
     def test(self):

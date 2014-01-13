@@ -2,6 +2,8 @@
 from decorated.base.function import Function
 from decorated.util import modutil
 
+_ENABLED = True
+
 class BaseDecorator(Function):
     def _init(self, cache, key):
         super(BaseDecorator, self)._init()
@@ -17,23 +19,29 @@ class Cache(object):
     def cache(self, key):
         class Decorator(BaseDecorator):
             def _call(self, *args, **kw):
-                d = self._resolve_args(*args, **kw)
-                key = self._key.eval(d)
-                result = self._cache._get(key)
-                if result is None:
-                    result = super(Decorator, self)._call(*args, **kw)
-                    self._cache._set(key, result)
-                return result
+                if _ENABLED:
+                    d = self._resolve_args(*args, **kw)
+                    key = self._key.eval(d)
+                    result = self._cache._get(key)
+                    if result is None:
+                        result = super(Decorator, self)._call(*args, **kw)
+                        self._cache._set(key, result)
+                    return result
+                else:
+                    return super(Decorator, self)._call(*args, **kw)
         return Decorator(self, key)
     
     def uncache(self, key):
         class Decorator(BaseDecorator):
             def _call(self, *args, **kw):
-                d = self._resolve_args(*args, **kw)
-                key = self._key.eval(d)
-                result = super(Decorator, self)._call(*args, **kw)
-                self._cache._delete(key)
-                return result
+                if _ENABLED:
+                    d = self._resolve_args(*args, **kw)
+                    key = self._key.eval(d)
+                    result = super(Decorator, self)._call(*args, **kw)
+                    self._cache._delete(key)
+                    return result
+                else:
+                    return super(Decorator, self)._call(*args, **kw)
         return Decorator(self, key)
     
     def _delete(self, key):
