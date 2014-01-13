@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import doctest
 import importlib
 import inspect
 import pkgutil
@@ -14,3 +15,19 @@ def load_modules(packages):
             if mod not in sys.modules:
                 loader.find_module(mod).load_module(mod)
                 
+def module_exists(modname):
+    '''
+    >>> module_exists('decorated.util.modutil')
+    True
+    >>> module_exists('fakepackage.fakemod')
+    False
+    '''
+    try:
+        importlib.import_module(modname)
+        return True
+    except:
+        return False
+    
+if __name__ == '__main__':
+    doctest.testmod()
+    
