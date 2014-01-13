@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from decorated import util
 from decorated.base.function import Function
 from decorated.decorators.once import Once
 from decorated.decorators.remove_extra_args import RemoveExtraArgs
+from decorated.util import modutil
 from six import with_metaclass
 import doctest
 
@@ -117,14 +117,14 @@ class EventError(Exception): pass
 @Once
 def init(packages):
     global _ENABLED
-    util.load_modules(packages)
+    modutil.load_modules(packages)
     _ENABLED = True
 
 def _get_full_name(func):
     '''
-    >>> from decorated import util
-    >>> _get_full_name(util.load_modules)
-    'decorated.util.load_modules'
+    >>> from decorated.util import modutil
+    >>> _get_full_name(modutil.load_modules)
+    'decorated.util.modutil.load_modules'
     '''
     return '%s.%s' % (func.__module__, func.__name__)
 
