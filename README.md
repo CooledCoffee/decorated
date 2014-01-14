@@ -101,6 +101,29 @@ Decorators
 
 Decorated comes with some common decorators.
 
+cache
+-----
+
+	from decorated.decorators.cache import SimpleCache
+	
+	cache = SimpleCache()
+	
+	@cache.cache('/{id}/{type}')
+	def foo(id, type, name):
+	    pass
+	    
+	@cache.uncache('/{id}/{type}')
+	def unfoo(id, type, name):
+	    pass
+	    
+	foo(1, 'type1', 'my name') # will execute the function and store the result in cache with key '/1/type1'
+	foo(1, 'type1', 'my name') # will use the result from cache with key '/1/type1'
+	foo(2, 'type2', 'your name') # will execute the function because '/2/type2' is missing in cache
+	unfoo(1, 'type1', 'my name') # will execute the function and then remove '/1/type1' from cache
+
+If you have pylru installed, you may replace SimpleCache with LruCache.
+You may also derive your own class from decorated.decorators.cache.Cache for memcached, redis, etc.
+
 conditional
 -----------
 
