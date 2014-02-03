@@ -25,7 +25,7 @@ def module_exists(modname):
     try:
         importlib.import_module(modname)
         return True
-    except:
+    except ImportError:
         return False
     
 if __name__ == '__main__':
