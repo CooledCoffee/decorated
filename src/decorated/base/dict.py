@@ -85,10 +85,22 @@ class DefaultDict(Dict):
     >>> d = DefaultDict(a=1, b=2)
     >>> d.a
     1
+    
+    >>> d = DefaultDict()
+    >>> len(d)
+    0
+    >>> len(d.items())
+    0
+    >>> len(d.keys())
+    0
+    >>> len(d.values())
+    0
+    >>> '_default' in d
+    False
     '''
     def __init__(self, default=None, **kw):
         super(DefaultDict, self).__init__(**kw)
-        self._default = default or (lambda key: None)
+        dict.__setattr__(self, '_default', default or (lambda key: None))
         
     def __getattr__(self, key):
         return self.__getitem__(key)
@@ -97,7 +109,7 @@ class DefaultDict(Dict):
         if key not in self:
             self[key] = self._default(key)
         return super(DefaultDict, self).__getitem__(key)
-    
+        
 if __name__ == '__main__':
     doctest.testmod()
     
