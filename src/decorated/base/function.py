@@ -22,12 +22,12 @@ class Function(Proxy):
     def __call__(self, *args, **kw):
         return self._decorate_or_call(*args, **kw)
     
-    def __get__(self, instance, instancetype):
-        if instance:
+    def __get__(self, obj, cls):
+        if obj:
             # access within instance (e.g., Foo().bar)
             # wrap the current functor with Function1
             # no matter the current functor is Function1 or Function2
-            return BoundedFunction(self, instance)
+            return BoundedFunction(self, obj)
         else:
             # access in static way (e.g., Foo.bar)
             return self
