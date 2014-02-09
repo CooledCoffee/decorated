@@ -115,7 +115,7 @@ class BeforeEventListener(EventListener):
 class EventError(Exception): pass
 
 @Once
-def init(packages):
+def init(*packages):
     global _ENABLED
     for p in packages:
         modutil.load_tree(p)
