@@ -1,17 +1,13 @@
 # -*- coding: utf-8 -*-
 import doctest
 import importlib
-import inspect
 import pkgutil
 import sys
 
-def load_modules(packages):
-    if not isinstance(packages, (list, tuple)):
-        packages = [packages]
-    for package in packages:
-        if not inspect.ismodule(package):
-            package = importlib.import_module(package)
-        for _, mod, _ in pkgutil.walk_packages(path=package.__path__, prefix=package.__name__ + '.'):
+def load_tree(root):
+    mod_or_pack = importlib.import_module(root)
+    if hasattr(mod_or_pack, '__path__'):
+        for _, mod, _ in pkgutil.walk_packages(path=mod_or_pack.__path__, prefix=mod_or_pack.__name__ + '.'):
             if mod not in sys.modules:
                 importlib.import_module(mod)
                 

@@ -117,14 +117,15 @@ class EventError(Exception): pass
 @Once
 def init(packages):
     global _ENABLED
-    modutil.load_modules(packages)
+    for p in packages:
+        modutil.load_tree(p)
     _ENABLED = True
 
 def _get_full_name(func):
     '''
     >>> from decorated.util import modutil
-    >>> _get_full_name(modutil.load_modules)
-    'decorated.util.modutil.load_modules'
+    >>> _get_full_name(modutil.load_tree)
+    'decorated.util.modutil.load_tree'
     '''
     return '%s.%s' % (func.__module__, func.__name__)
 

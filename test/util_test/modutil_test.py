@@ -2,7 +2,10 @@
 from decorated.util import modutil
 from unittest.case import TestCase
 
-class LoadModulesTest(TestCase):
-    def test(self):
-        modutil.load_modules('decorated')
+class LoadTreeTest(TestCase):
+    def test_package(self):
+        modutil.load_tree('decorated')
+        
+    def test_module(self):
+        modutil.load_tree('decorated.util.modutil')
         
