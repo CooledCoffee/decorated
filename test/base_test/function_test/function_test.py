@@ -5,140 +5,169 @@ from unittest.case import TestCase
 import inspect
 
 @Function
-def foo(id, name='default name'):
-    return '%s|%s' % (id, name)
+def foo(a, b=0):
+    return a + b
 
 class InitTest(TestCase):
     def test_no_arg(self):
-        decorated = Function(foo)
-        self.assertEquals(('id', 'name'), decorated.params)
+        class _decorator(Function):
+            def _init(self):
+                self.inited = True
+        @_decorator
+        def foo():
+            pass
+        self.assertTrue(foo.inited)
         
     def test_with_args(self):
-        decorated = Function(1, b=2)(foo)
-        self.assertEquals(('id', 'name'), decorated.params)
-
+        class _decorator(Function):
+            def _init(self, a, b=0):
+                self.a = a
+                self.b = b
+        @_decorator(1, b=2)
+        def foo():
+            pass
+        self.assertEqual(1, foo.a)
+        self.assertEqual(2, foo.b)
+        
 class DecorateTest(TestCase):
-    def test_single_level(self):
+    def test_no_init_args(self):
+        @Function
+        def foo(a, b=0):
+            pass
         self.assertEquals('foo', foo.__name__)
-        self.assertEquals(('id', 'name'), foo.params)
         self.assertTrue(hasattr(foo, 'func_code') or hasattr(foo, '__code__'))
-        self.assertEquals(('id', 'name'), foo.params)
-        self.assertEquals(('id',), foo.required_params)
-        self.assertEquals((('name','default name'),), foo.optional_params)
+        self.assertEquals(('a', 'b'), foo.params)
+        self.assertEquals(('a',), foo.required_params)
+        self.assertEquals((('b',0),), foo.optional_params)
+        self.assertEqual(foo._call, foo._decorate_or_call)
+        
+    def test_with_init_args(self):
+        @Function(1)
+        def foo(a, b=0):
+            pass
+        self.assertEquals('foo', foo.__name__)
+        self.assertTrue(hasattr(foo, 'func_code') or hasattr(foo, '__code__'))
+        self.assertEquals(('a', 'b'), foo.params)
+        self.assertEquals(('a',), foo.required_params)
+        self.assertEquals((('b',0),), foo.optional_params)
+        self.assertEqual(foo._call, foo._decorate_or_call)
         
     def test_multi_levels(self):
-        foo2 = Function(foo)
-        self.assertEquals('foo', foo2.__name__)
-        self.assertEquals(('id', 'name'), foo2.params)
-        self.assertTrue(hasattr(foo2, 'func_code') or hasattr(foo2, '__code__'))
+        @Function
+        @Function
+        def foo(a, b=0):
+            pass
+        self.assertEquals('foo', foo.__name__)
+        self.assertTrue(hasattr(foo, 'func_code') or hasattr(foo, '__code__'))
+        self.assertEquals(('a', 'b'), foo.params)
+        self.assertEquals(('a',), foo.required_params)
+        self.assertEquals((('b',0),), foo.optional_params)
         
     def test_method(self):
         class Foo(object):
-            def bar(self, a, b):
+            @Function
+            def bar(self, a, b=0):
                 pass
-        self.assertEqual(('self', 'a', 'b'), Function(Foo.bar).params)
-        self.assertEqual(('a', 'b'), Function(Foo().bar).params)
+        self.assertEquals('bar', Foo.bar.__name__)
+        self.assertTrue(hasattr(Foo.bar, 'func_code') or hasattr(Foo.bar, '__code__'))
+        self.assertEquals(('self', 'a', 'b'), Foo.bar.params)
+        self.assertEquals(('self', 'a',), Foo.bar.required_params)
+        self.assertEquals((('b',0),), Foo.bar.optional_params)
+        
+    def test_static_method(self):
+        class Foo(object):
+            @staticmethod
+            @Function
+            def bar(a, b=0):
+                pass
+        self.assertEquals('bar', Foo.bar.__name__)
+        self.assertTrue(hasattr(Foo.bar, 'func_code') or hasattr(Foo.bar, '__code__'))
+        self.assertEquals(('a', 'b'), Foo.bar.params)
+        self.assertEquals(('a',), Foo.bar.required_params)
+        self.assertEquals((('b',0),), Foo.bar.optional_params)
+        
+    def test_class_method(self):
+        class Foo(object):
+            @classmethod
+            @Function
+            def bar(cls, a, b=0):
+                pass
+        self.assertEquals('bar', Foo.bar.__name__)
+        self.assertTrue(hasattr(Foo.bar, 'func_code') or hasattr(Foo.bar, '__code__'))
+        self.assertEquals(('cls', 'a', 'b'), Foo.bar.params)
+        self.assertEquals(('cls', 'a',), Foo.bar.required_params)
+        self.assertEquals((('b',0),), Foo.bar.optional_params)
         
 class TargetTest(TestCase):
     def test_raw_function(self):
+        @Function
+        def foo():
+            pass
         target = foo.target()
         self.assertTrue(inspect.isfunction(target))
-
+        
     def test_function_wrapper(self):
-        bar = Function(foo)
-        target = bar.target()
+        @Function
+        @Function
+        def foo():
+            pass
+        target = foo.target()
         self.assertTrue(inspect.isfunction(target))
         
 class StrTest(TestCase):
     def test(self):
         s = str(foo)
         self.assertEquals('<Function base_test.function_test.function_test.foo>', s)
-
+        
 class ResolveArgsTest(TestCase):
     def test_simple(self):
-        d = foo._resolve_args(1, name='my name')
+        d = foo._resolve_args(1, b=2)
         self.assertEquals(2, len(d))
-        self.assertEquals(1, d['id'])
-        self.assertEquals('my name', d['name'])
-        
-    def test_kw_as_args(self):
-        d = foo._resolve_args(1, 'my name')
-        self.assertEquals(2, len(d))
-        self.assertEquals(1, d['id'])
-        self.assertEquals('my name', d['name'])
-        
-    def test_arg_as_kw(self):
-        d = foo._resolve_args(id=1, name='my name')
-        self.assertEquals(2, len(d))
-        self.assertEquals(1, d['id'])
-        self.assertEquals('my name', d['name'])
+        self.assertEquals(1, d['a'])
+        self.assertEquals(2, d['b'])
         
     def test_default_arg(self):
         d = foo._resolve_args(1)
         self.assertEquals(2, len(d))
-        self.assertEquals(1, d['id'])
-        self.assertEquals('default name', d['name'])
+        self.assertEquals(1, d['a'])
+        self.assertEquals(0, d['b'])
+        
+    def test_kw_as_args(self):
+        d = foo._resolve_args(1, 2)
+        self.assertEquals(2, len(d))
+        self.assertEquals(1, d['a'])
+        self.assertEquals(2, d['b'])
+        
+    def test_arg_as_kw(self):
+        d = foo._resolve_args(a=1, b=2)
+        self.assertEquals(2, len(d))
+        self.assertEquals(1, d['a'])
+        self.assertEquals(2, d['b'])
         
     def test_missing_arg(self):
         with self.assertRaises(Exception):
             foo._resolve_args()
             
-    def test_args(self):
-        def foo(id, *args):
-            pass
-        decorated = Function(foo)
-        d = decorated._resolve_args(1, 2, 3)
-        self.assertEquals(1, len(d))
-        self.assertEquals(1, d['id'])
-            
-    def test_kw(self):
-        def foo(id, **kw):
-            pass
-        decorated = Function(foo)
-        d = decorated._resolve_args(1, a=2)
-        self.assertEquals(1, len(d))
-        self.assertEquals(1, d['id'])
-            
 class EvaluateExpressionTest(TestCase):
     def test_success(self):
-        result = foo._evaluate_expression('str(id) + "-" + name', 1, name='my name')
-        self.assertEquals('1-my name', result)
+        result = foo._evaluate_expression('a + b', 1, b=2)
+        self.assertEquals(3, result)
         
     def test_failed(self):
         with self.assertRaises(Exception):
-            foo._evaluate_expression('!@#$%', 1, name='my name')
+            foo._evaluate_expression('!@#$%', 1, b=2)
             
 class CompileTemplateTest(TestCase):
     def test_success(self):
-        template = foo._compile_template('Id is {id}.')
+        template = foo._compile_template('A is {a}.')
         self.assertIsInstance(template, Template)
         
     def test_failed(self):
         with self.assertRaises(TemplateError):
-            foo._compile_template('Email is {email}.')
+            foo._compile_template('C is {c}.')
         
 class CallTest(TestCase):
     def test_no_init_arg(self):
-        decorated = Function(foo)
-        rslt = decorated('111', 'my name')
-        self.assertEquals('111|my name', rslt)
-        
-    def test_with_init_args(self):
-        decorated = Function(1, b=2)(foo)
-        rslt = decorated('111', 'my name')
-        self.assertEquals('111|my name', rslt)
-        
-    def test_args(self):
-        def foo(id, *args):
-            return args[0]
-        decorated = Function(foo)
-        result = decorated(1, 2, 3)
-        self.assertEquals(2, result)
-        
-    def test_kw(self):
-        def foo(id, **kw):
-            return kw['a']
-        decorated = Function(foo)
-        result = decorated(1, a=2)
-        self.assertEquals(2, result)
+        result = foo(1, b=2)
+        self.assertEqual(3, result)
         
