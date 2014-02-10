@@ -63,41 +63,6 @@ class DecorateTest(TestCase):
         self.assertEquals(('a',), foo.required_params)
         self.assertEquals((('b',0),), foo.optional_params)
         
-    def test_method(self):
-        class Foo(object):
-            @Function
-            def bar(self, a, b=0):
-                pass
-        self.assertEquals('bar', Foo.bar.__name__)
-        self.assertTrue(hasattr(Foo.bar, 'func_code') or hasattr(Foo.bar, '__code__'))
-        self.assertEquals(('self', 'a', 'b'), Foo.bar.params)
-        self.assertEquals(('self', 'a',), Foo.bar.required_params)
-        self.assertEquals((('b',0),), Foo.bar.optional_params)
-        
-    def test_static_method(self):
-        class Foo(object):
-            @staticmethod
-            @Function
-            def bar(a, b=0):
-                pass
-        self.assertEquals('bar', Foo.bar.__name__)
-        self.assertTrue(hasattr(Foo.bar, 'func_code') or hasattr(Foo.bar, '__code__'))
-        self.assertEquals(('a', 'b'), Foo.bar.params)
-        self.assertEquals(('a',), Foo.bar.required_params)
-        self.assertEquals((('b',0),), Foo.bar.optional_params)
-        
-    def test_class_method(self):
-        class Foo(object):
-            @classmethod
-            @Function
-            def bar(cls, a, b=0):
-                pass
-        self.assertEquals('bar', Foo.bar.__name__)
-        self.assertTrue(hasattr(Foo.bar, 'func_code') or hasattr(Foo.bar, '__code__'))
-        self.assertEquals(('cls', 'a', 'b'), Foo.bar.params)
-        self.assertEquals(('cls', 'a',), Foo.bar.required_params)
-        self.assertEquals((('b',0),), Foo.bar.optional_params)
-        
 class TargetTest(TestCase):
     def test_raw_function(self):
         @Function

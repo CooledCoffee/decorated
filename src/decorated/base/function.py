@@ -23,14 +23,7 @@ class Function(Proxy):
         return self._decorate_or_call(*args, **kw)
     
     def __get__(self, obj, cls):
-        if obj:
-            # access within instance (e.g., Foo().bar)
-            # wrap the current functor with Function1
-            # no matter the current functor is Function1 or Function2
-            return Method(self, obj, cls)
-        else:
-            # access in static way (e.g., Foo.bar)
-            return self
+        return Method(self, obj, cls)
     
     def __str__(self):
         return '<Function %s.%s>' % (self._func.__module__, self.__name__)
@@ -121,7 +114,8 @@ def PartialFunction(func, init_args=(), init_kw=None, call_args=(), call_kw=None
     return _PartialFunction
         
 def Method(func, obj, cls):
-    method = PartialFunction(Function, call_args=(obj,))(func)
+    call_args = (obj,) if obj is not None else ()
+    method = PartialFunction(Function, call_args=call_args)(func)
     method.im_class = cls
     method.im_func = method.__func__ = func
     method.im_self = method.__self__ = obj
