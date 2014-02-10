@@ -136,10 +136,7 @@ def _is_bound_method(func):
     >>> _is_bound_method(Foo().bar)
     True
     '''
-    try:
-        return func.__self__ is not None
-    except:
-        return False
+    return hasattr(func, '__self__') and func.__self__ is not None
 
 if __name__ == '__main__':
     doctest.testmod()
