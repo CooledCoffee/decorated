@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from decorated.base.function import Function, BoundedFunction, PartialFunction
+from decorated.base.function import Function, PartialFunction, Method
 from decorated.decorators.conditional import Conditional
 from decorated.decorators.events import Event
 from decorated.decorators.instantiate import Instantiate
@@ -10,7 +10,7 @@ from decorated.decorators.synchronized import Synchronized
 
 Function = Function
 PartialFunction = PartialFunction
-BoundedFunction = BoundedFunction
+Method = Method
 
 Event = Event
 conditional = Conditional

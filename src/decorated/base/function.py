@@ -27,7 +27,7 @@ class Function(Proxy):
             # access within instance (e.g., Foo().bar)
             # wrap the current functor with Function1
             # no matter the current functor is Function1 or Function2
-            return BoundedFunction(self, obj)
+            return Method(self, obj)
         else:
             # access in static way (e.g., Foo.bar)
             return self
@@ -120,7 +120,7 @@ def PartialFunction(func, init_args=(), init_kw=None, call_args=(), call_kw=None
             self.optional_params = tuple([(k, v) for (k, v) in self.optional_params if k not in call_kw])
     return _PartialFunction
         
-def BoundedFunction(func, instance):
+def Method(func, instance):
     return PartialFunction(Function, call_args=(instance,))(func)
 
 def _is_bound_method(func):

@@ -3,58 +3,60 @@ from decorated.base.function import Function
 from unittest.case import TestCase
 
 class MethodTest(TestCase):
-    def test_instance_single_level(self):
+    def test_single_level(self):
         # set up
-        class _Class(object):
+        class Foo(object):
             @Function
-            def foo(self, id, name='default name'):
-                return id
+            def bar(self, a, b=0):
+                return a + b
             
         # test
-        ret = _Class().foo(111)
-        self.assertEquals(111, ret)
+        result = Foo().bar(1, b=2)
+        self.assertEquals(3, result)
         
-    def test_instance_multi_levels(self):
+    def test_multi_levels(self):
         # set up
-        class _Class(object):
+        class Foo(object):
             @Function
             @Function
-            def foo(self, id, name='default name'):
-                return id
+            def bar(self, a, b=0):
+                return a + b
             
         # test
-        ret = _Class().foo(111)
-        self.assertEquals(111, ret)
+        result = Foo().bar(1, b=2)
+        self.assertEquals(3, result)
         
     def test_static_method(self):
         # set up
-        class _Class(object):
+        class Foo(object):
             @staticmethod
             @Function
-            def foo(id, name='default name'):
-                return id
+            def bar(a, b=0):
+                return a + b
             
         # test
-        self.assertEqual(111, _Class.foo(111))
+        result = Foo.bar(1, b=2)
+        self.assertEqual(3, result)
         
     def test_class_method(self):
         # set up
-        class _Class(object):
+        class Foo(object):
             @classmethod
             @Function
-            def foo(cls, id, name='default name'):
-                return id
+            def bar(cls, a, b=0):
+                return a + b
             
         # test
-        self.assertEqual(111, _Class.foo(111))
+        result = Foo.bar(1, b=2)
+        self.assertEqual(3, result)
         
     def test_get_method(self):
         # set up
-        class _Class(object):
+        class Foo(object):
             @Function
-            def foo(self, id, name='default name'):
-                return id
+            def bar(self, a, b=0):
+                return a + b
             
         # test
-        self.assertIsInstance(_Class.foo, Function)
+        self.assertIsInstance(Foo.bar, Function)
         

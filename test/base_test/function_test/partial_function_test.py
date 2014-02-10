@@ -2,15 +2,15 @@
 from decorated.base.function import Function, PartialFunction
 from unittest.case import TestCase
 
-def foo(d, e, f=None):
-    return d + e + f
-
 class FullDecorator(Function):
     def _init(self, a, b, c=None):
         self.a = a
         self.b = b
         self.c = c
     
+def foo(d, e, f=None):
+    return d + e + f
+
 class InitTest(TestCase):
     def test_with_nothing(self):
         partial_decorator = PartialFunction(FullDecorator)
