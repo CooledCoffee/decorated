@@ -23,7 +23,12 @@ class Function(Proxy):
         return self._decorate_or_call(*args, **kw)
     
     def __get__(self, obj, cls):
-        return Method(self, obj, cls)
+        call_args = (obj,) if obj is not None else ()
+        method = partial(Function, call_args=call_args)(self)
+        method.im_class = cls
+        method.im_func = method.__func__ = self
+        method.im_self = method.__self__ = obj
+        return method
     
     def __str__(self):
         return '<Function %s.%s>' % (self._func.__module__, self.__name__)
@@ -87,7 +92,7 @@ class Function(Proxy):
     def _target(self):
         return self._func
     
-def PartialFunction(func, init_args=(), init_kw=None, call_args=(), call_kw=None):
+def partial(func, init_args=(), init_kw=None, call_args=(), call_kw=None):
     if init_kw is None:
         init_kw = {}
     if call_kw is None:
@@ -113,14 +118,6 @@ def PartialFunction(func, init_args=(), init_kw=None, call_args=(), call_kw=None
             self.optional_params = tuple([(k, v) for (k, v) in self.optional_params if k not in call_kw])
     return _PartialFunction
         
-def Method(func, obj, cls):
-    call_args = (obj,) if obj is not None else ()
-    method = PartialFunction(Function, call_args=call_args)(func)
-    method.im_class = cls
-    method.im_func = method.__func__ = func
-    method.im_self = method.__self__ = obj
-    return method
-
 def _is_bound_method(func):
     '''
     >>> def foo():
