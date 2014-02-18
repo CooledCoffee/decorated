@@ -13,6 +13,7 @@ class Function(Proxy):
         self.required_params = None
         self.optional_params = None
         self._decorate_or_call = self._decorate
+        self._method_cache = {}
         if len(args) == 1 and callable(args[0]) and len(kw) == 0:
             self._init()
             self._decorate(args[0])
@@ -23,11 +24,17 @@ class Function(Proxy):
         return self._decorate_or_call(*args, **kw)
     
     def __get__(self, obj, cls):
+        if obj is None:
+            cached = self._method_cache.get(cls)
+            if cached is not None:
+                return cached
         call_args = (obj,) if obj is not None else ()
         method = partial(Function, call_args=call_args)(self)
         method.im_class = cls
         method.im_func = method.__func__ = self
         method.im_self = method.__self__ = obj
+        if obj is None:
+            self._method_cache[cls] = method
         return method
     
     def __str__(self):
