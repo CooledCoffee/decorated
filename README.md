@@ -322,7 +322,7 @@ You can combine different decorators to achieve more complex functions. For exam
 Loggingd
 ========
 
-Loggingd (<a href="https://github.com/CooledCoffee/loggingd" target="_blank">https://github.com/CooledCoffee/loggingd</a>) is a logging framework based on decorated. You can log using decorators.
+<a href="https://github.com/CooledCoffee/loggingd" target="_blank">Loggingd</a> is a logging framework based on decorated. You can log using decorators.
 
 	from loggingd import log_enter, log_return, log_error
 	
@@ -335,9 +335,5 @@ Loggingd (<a href="https://github.com/CooledCoffee/loggingd" target="_blank">htt
 Author
 ======
 
-Mengchen LEE
-
-Google Plus: <a href="https://plus.google.com/117704742936410336204" target="_blank">https://plus.google.com/117704742936410336204</a>
-
-LinkedIn: <a href="https://cn.linkedin.com/pub/mengchen-lee/30/8/23a" target="_blank">https://cn.linkedin.com/pub/mengchen-lee/30/8/23a</a>
+Mengchen LEE: <a href="https://plus.google.com/117704742936410336204" target="_blank">Google Plus</a>, <a href="https://cn.linkedin.com/pub/mengchen-lee/30/8/23a" target="_blank">LinkedIn</a>
 
