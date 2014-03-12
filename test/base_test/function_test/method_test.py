@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 from decorated.base.function import Function
 from unittest.case import TestCase
+import gc
 import six
 
 class MethodTest(TestCase):
@@ -91,4 +92,8 @@ class MethodTest(TestCase):
             def bar(self, a, b=0):
                 return a + b
         self.assertEqual(Foo.bar, Foo.bar)
+        foo = Foo()
+        self.assertEqual(foo.bar, foo.bar)
+        del foo
+        self.assertEqual(0, len(Foo.bar._instance_cache))
         
