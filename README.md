@@ -322,7 +322,7 @@ You can combine different decorators to achieve more complex functions. For exam
 Loggingd
 ========
 
-Loggingd (https://github.com/CooledCoffee/loggingd) is a logging framework based on decorated. You can log using decorators.
+<a href="https://github.com/CooledCoffee/loggingd" target="_blank">Loggingd</a> is a logging framework based on decorated. You can log using decorators.
 
 	from loggingd import log_enter, log_return, log_error
 	
@@ -332,3 +332,8 @@ Loggingd (https://github.com/CooledCoffee/loggingd) is a logging framework based
 	def divide(a, b):
         return a / b
         
+Author
+======
+
+Mengchen LEE: <a href="https://plus.google.com/117704742936410336204" target="_blank">Google Plus</a>, <a href="https://cn.linkedin.com/pub/mengchen-lee/30/8/23a" target="_blank">LinkedIn</a>
+
