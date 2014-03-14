@@ -16,6 +16,9 @@ setup(
         'Topic :: Software Development :: Libraries',
     ],
     description='Base components for easily writing decorators.',
+    extras_require={
+        'test': ['fixtures'],
+    },
     install_requires=[
         'six',
     ],

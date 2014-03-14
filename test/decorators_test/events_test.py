@@ -1,23 +1,19 @@
 # -*- coding: utf-8 -*-
-from decorated.decorators import events
 from decorated.decorators.events import Event, EventError
-from unittest.case import TestCase
+from fixtures._fixtures.monkeypatch import MonkeyPatch
+from fixtures.testcase import TestWithFixtures
 
 class FooEvent(Event):
     fields = ('a', 'b')
     ret_field = 'z'
     
-class EventTest(TestCase):
+class EventTest(TestWithFixtures):
     def setUp(self):
         super(EventTest, self).setUp()
-        events._ENABLED = True
+        self.useFixture(MonkeyPatch('decorated.decorators.events._ENABLED', True))
         FooEvent._sources = []
         FooEvent._after_listeners = []
         
-    def tearDown(self):
-        events._ENABLED = False
-        super(EventTest, self).tearDown()
-
 class DecorateTest(EventTest):
     def test(self):
         @FooEvent
