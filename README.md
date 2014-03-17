@@ -270,6 +270,18 @@ You can also implement distributed locks using mysql, zookeeper, etc.
 	def bar():
 	    pass
 	    
+timeout
+-------
+
+	from decorated import timeout
+	import time
+	
+	@timeout(60)
+	def foo():
+		time.sleep(120)
+		
+A TimeoutError will be raised if foo takes more than 60 seconds.
+
 events
 ------
 
@@ -336,4 +348,3 @@ Author
 ======
 
 Mengchen LEE: <a href="https://plus.google.com/117704742936410336204" target="_blank">Google Plus</a>, <a href="https://cn.linkedin.com/pub/mengchen-lee/30/8/23a" target="_blank">LinkedIn</a>
-
