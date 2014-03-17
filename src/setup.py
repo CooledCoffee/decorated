@@ -15,7 +15,7 @@ setup(
         'Programming Language :: Python :: 3',
         'Topic :: Software Development :: Libraries',
     ],
-    description='Base components for easily writing decorators.',
+    description='Decorator framework and common decorators for python.',
     extras_require={
         'test': ['fixtures'],
     },
