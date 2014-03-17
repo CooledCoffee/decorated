@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from decorated.decorators.timeout import Timeout, TimeoutError
+from decorated.decorators.timeout import Timeout, TimeoutError, TimeoutDecorator
 from unittest.case import TestCase
 import time
 
@@ -33,3 +33,11 @@ class TimeoutTest(TestCase):
                         time.sleep(10)
                 time.sleep(10)
                 
+class TimeoutDecoratorTest(TestCase):
+    def test(self):
+        @TimeoutDecorator(1)
+        def foo():
+            time.sleep(10)
+        with self.assertRaises(TimeoutError):
+            foo()
+            
