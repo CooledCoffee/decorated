@@ -3,6 +3,9 @@ from decorated.base.dict import Dict
 from decorated.base.proxy import Proxy
 from decorated.base.thread_local import ThreadLocal
 import doctest
+import logging
+
+log = logging.getLogger(__name__)
 
 class Context(Dict):
     _current = ThreadLocal()
@@ -16,9 +19,16 @@ class Context(Dict):
         
     def __enter__(self):
         Context._current.set(self)
+        self._defers = []
         return self
     
     def __exit__(self, error_type, error_value, traceback):
+        for defer in self._defers:
+            try:
+                defer()
+            except:
+                log.warn('Failed to execute defer "%s".' % defer)
+                pass
         Context._current.set(self._parent)
         
     def __getattr__(self, name):
@@ -35,7 +45,10 @@ class Context(Dict):
             
     def __getitem__(self, name):
         raise NotImplementedError()
-            
+    
+    def defer(self, action):
+        self._defers.append(action)
+        
     def dict(self):
         data = self._parent.dict() if self._parent else Dict()
         data.update({k: v for k, v in self.items() if not k.startswith('_')})

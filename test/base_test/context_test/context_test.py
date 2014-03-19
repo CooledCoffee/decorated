@@ -57,3 +57,26 @@ class DictTest(TestCase):
                 data = ctx.dict()
                 self.assertEqual({'a': 1, 'b': 3}, data)
                 
+class DeferTest(TestCase):
+    def test_normal(self):
+        self.calls = []
+        def _action1():
+            self.calls.append('action1')
+        def _action2():
+            self.calls.append('action2')
+        with Context() as ctx:
+            ctx.defer(_action1)
+            ctx.defer(_action2)
+        self.assertEqual(['action1', 'action2'], self.calls)
+        
+    def test_error(self):
+        self.calls = []
+        def _action1():
+            raise Exception
+        def _action2():
+            self.calls.append('action2')
+        with Context() as ctx:
+            ctx.defer(_action1)
+            ctx.defer(_action2)
+        self.assertEqual(['action2'], self.calls)
+        
