@@ -1,13 +1,14 @@
-# editor
-*~
-
-# hidden files
+# common
 .*
+*~
+*.swp
 
 # python
 *.pyc
+__pycache__
 
-# package directories
+# pip
 src/build
 src/dist
 src/MANIFEST
+
