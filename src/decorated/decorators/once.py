@@ -7,11 +7,11 @@ class Once(Function):
         key = self._evaluate_expression(self._key, *args, **kw)
         key = (self._func, key)
         try:
-            results = ctx.once_results
+            results = ctx._once
         except ContextError:
-            results = _DEFAULT_SESSION.once_results
+            results = _DEFAULT_SESSION._once
         except AttributeError:
-            results = _DEFAULT_SESSION.once_results
+            results = _DEFAULT_SESSION._once
         if key in results:
             result = results[key]
         else:
@@ -26,6 +26,6 @@ class Once(Function):
 class OnceSession(Context):
     def __init__(self):
         super(OnceSession, self).__init__()
-        self.once_results = {}
+        self._once = {}
         
 _DEFAULT_SESSION = OnceSession()
