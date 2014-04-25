@@ -3,21 +3,24 @@
 class Proxy(object):
     def __init__(self, target=None):
         super(Proxy, self).__init__()
-        self._orig_target = target
+        self._target = target
         
     def __getattr__(self, name):
         if name in self.__dict__:
             return self.__dict__[name]
         else:
-            target = self._target()
-            if target:
-                try:
-                    return getattr(target, name)
-                except AttributeError:
-                    raise AttributeError("'%s' object has no attribute '%s'" % (type(self).__name__, name))
-            else:
-                raise AttributeError('%s object has no attribute "%s", and target is not available.' % (type(self), name))
-    
-    def _target(self):
-        return self._orig_target
-    
+            try:
+                return getattr(self.target, name)
+            except NoTargetError:
+                raise AttributeError("'%s' object has no attribute '%s'" % (type(self).__name__, name))
+            except AttributeError:
+                raise AttributeError("'%s' object has no attribute '%s'" % (type(self).__name__, name))
+            
+    @property
+    def target(self):
+        if self._target is None:
+            raise NoTargetError()
+        return self._target
+
+class NoTargetError(Exception):
+    pass

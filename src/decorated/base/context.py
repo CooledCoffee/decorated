@@ -64,21 +64,21 @@ class ContextProxy(Proxy):
         
     def __setattr__(self, name, value):
         if self.__dict__.get('_inited'):
-            target = self._target()
-            return setattr(target, name, value)
+            return setattr(self.target, name, value)
         else:
             self.__dict__[name] = value
     
-    def get(self):
-        return self._target()
-        
-    def _target(self):
+    @property
+    def target(self):
         ctx = Context._current.get()
         if ctx:
             return ctx
         else:
             raise ContextError('Context should be set first.')
     
+    def get(self):
+        return self.target
+        
 class ContextError(Exception):
     pass
 

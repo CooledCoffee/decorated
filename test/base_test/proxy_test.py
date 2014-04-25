@@ -1,20 +1,26 @@
 # -*- coding: utf-8 -*-
-from decorated.base.proxy import Proxy
+from decorated.base.proxy import Proxy, NoTargetError
 from unittest.case import TestCase
 
 class TargetTest(TestCase):
-    def test_static(self):
+    def test_static_success(self):
         target = object()
-        proxied = Proxy(target)
-        self.assertEqual(target, proxied._target())
+        proxy = Proxy(target)
+        self.assertEqual(target, proxy.target)
+        
+    def test_static_none(self):
+        proxy = Proxy(None)
+        with self.assertRaises(NoTargetError):
+            proxy.target
         
     def test_dynamic(self):
         target = object()
         class DynamicProxy(Proxy):
-            def _target(self):
+            @property
+            def target(self):
                 return target
-        proxied = DynamicProxy()
-        self.assertEqual(target, proxied._target())
+        proxy = DynamicProxy()
+        self.assertEqual(target, proxy.target)
 
 class GetAttrTest(TestCase):
     def test_found_in_proxy(self):
@@ -24,7 +30,7 @@ class GetAttrTest(TestCase):
             def __init__(self, target):
                 super(TestProxy, self).__init__(target)
                 self.foo = 'foo'
-                
+                 
             def bar(self):
                 return 'bar'
         proxy = TestProxy(Target())
@@ -35,7 +41,7 @@ class GetAttrTest(TestCase):
         class Target(object):
             def __init__(self):
                 self.foo = 'foo'
-                
+                 
             def bar(self):
                 return 'bar'
         proxy = Proxy(Target())

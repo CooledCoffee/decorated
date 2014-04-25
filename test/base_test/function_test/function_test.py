@@ -63,21 +63,19 @@ class DecorateTest(TestCase):
         self.assertEquals(('a',), foo.required_params)
         self.assertEquals((('b',0),), foo.optional_params)
         
-class TargetTest(TestCase):
+class FuncTest(TestCase):
     def test_raw_function(self):
         @Function
         def foo():
             pass
-        target = foo.target()
-        self.assertTrue(inspect.isfunction(target))
+        self.assertTrue(inspect.isfunction(foo.func))
         
     def test_function_wrapper(self):
         @Function
         @Function
         def foo():
             pass
-        target = foo.target()
-        self.assertTrue(inspect.isfunction(target))
+        self.assertTrue(inspect.isfunction(foo.func))
         
 class StrTest(TestCase):
     def test(self):

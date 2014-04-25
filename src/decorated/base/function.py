@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-from decorated.base.proxy import Proxy
+from decorated.base.proxy import Proxy, NoTargetError
 from decorated.util import templates
 from weakref import WeakKeyDictionary
 import doctest
@@ -43,8 +43,15 @@ class Function(Proxy):
     def __str__(self):
         return '<Function %s.%s>' % (self._func.__module__, self.__name__)
     
+    @property
+    def func(self):
+        return self._func.func if isinstance(self._func, Function) else self._func
+    
+    @property
     def target(self):
-        return self._func.target() if isinstance(self._func, Function) else self._func
+        if self._func is None:
+            raise NoTargetError()
+        return self._func
     
     def _call(self, *args, **kw):
         return self._func(*args, **kw)
@@ -98,9 +105,6 @@ class Function(Proxy):
                 raise Exception('Missing argument "%s" for %s.' % (name, str(self)))
         d = {k: v for k, v in d.items() if k in self.params}
         return d
-    
-    def _target(self):
-        return self._func
     
 def partial(func, init_args=(), init_kw=None, call_args=(), call_kw=None):
     if init_kw is None:
