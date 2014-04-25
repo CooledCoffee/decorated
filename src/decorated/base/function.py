@@ -13,6 +13,7 @@ class Function(Proxy):
         self.params = None
         self.required_params = None
         self.optional_params = None
+        self._func = None
         self._decorate_or_call = self._decorate
         self._static_cache = {}
         self._instance_cache = WeakKeyDictionary()
