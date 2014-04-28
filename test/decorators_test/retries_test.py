@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from decorated.decorators.retries import Retries
-from unittest.case import TestCase
+from fixtures._fixtures.monkeypatch import MonkeyPatch
+from fixtures2 import TestCase
 
 class RetriesTest(TestCase):
     def test_success_at_first(self):
@@ -26,11 +27,11 @@ class RetriesTest(TestCase):
         @Retries(3)
         def foo():
             foo.times += 1
-            raise Exception('Failed at retry %d.' % foo.times)
+            raise Exception()
         foo.times = 0
-        with self.assertRaises(Exception) as err:
+        with self.assertRaises(Exception):
             foo()
-        self.assertEqual('Failed at retry 3.', str(err.exception))
+        self.assertEqual(3, foo.times)
         
     def test_invalid_times(self):
         with self.assertRaises(Exception):
@@ -42,4 +43,14 @@ class RetriesTest(TestCase):
             def bar():
                 pass
             
-            
+    def test_not_enabled(self):
+        self.useFixture(MonkeyPatch('decorated.decorators.retries.ENABLED', False))
+        @Retries(3)
+        def foo():
+            foo.times += 1
+            raise Exception()
+        foo.times = 0
+        with self.assertRaises(Exception):
+            foo()
+        self.assertEqual(1, foo.times)
+        
