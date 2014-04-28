@@ -2,8 +2,13 @@
 from decorated.base.context import Context, ctx, ContextError
 from decorated.base.function import Function
 
+ENABLED = True
+
 class Once(Function):
     def _call(self, *args, **kw):
+        if not ENABLED:
+            return super(Once, self)._call(*args, **kw)
+        
         key = self._evaluate_expression(self._key, *args, **kw)
         key = (self._func, key)
         try:

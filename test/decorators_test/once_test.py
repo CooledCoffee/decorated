@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from decorated.base.context import Context
 from decorated.decorators.once import Once, OnceSession
-from unittest.case import TestCase
+from fixtures._fixtures.monkeypatch import MonkeyPatch
+from fixtures2 import TestCase
 
 class DefaultSessionTest(TestCase):
     def test_no_key(self):
@@ -28,6 +29,14 @@ class DefaultSessionTest(TestCase):
             return a * b
         self.assertEqual(3, add(1, 2))
         self.assertEqual(2, mul(1, 2))
+        
+    def test_not_enabled(self):
+        self.useFixture(MonkeyPatch('decorated.decorators.once.ENABLED', False))
+        @Once
+        def foo(a, b):
+            return a + b
+        self.assertEqual(3, foo(1, 2))
+        self.assertEqual(7, foo(3, 4))
         
 class WithSessionTest(TestCase):
     def test_single_level(self):
