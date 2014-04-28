@@ -3,8 +3,12 @@ from decorated.base.function import Function
 from decorated.decorators.remove_extra_args import RemoveExtraArgs
 import six
 
+ENABLED = True
+
 class Conditional(Function):
     def _call(self, *args, **kw):
+        if not ENABLED:
+            return super(Conditional, self)._call(*args, **kw)
         if self._test(*args, **kw):
             return super(Conditional, self)._call(*args, **kw)
         

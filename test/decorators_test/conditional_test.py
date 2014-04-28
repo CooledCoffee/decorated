@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from decorated.decorators.conditional import Conditional
-from unittest.case import TestCase
+from fixtures._fixtures.monkeypatch import MonkeyPatch
+from fixtures2 import TestCase
 
 class FunctionTest(TestCase):
     def test_string(self):
@@ -35,6 +36,14 @@ class FunctionTest(TestCase):
             return a
         self.assertEqual(1, foo(1, 1))
         self.assertIsNone(foo(2, 2))
+        
+    def test_not_enabled(self):
+        self.useFixture(MonkeyPatch('decorated.decorators.conditional.ENABLED', False))
+        @Conditional(condition='a == 1')
+        def foo(a, b):
+            return a
+        self.assertEqual(1, foo(1, 1))
+        self.assertEqual(2, foo(2, 2))
         
 class MethodTest(TestCase):
     def test_normal(self):
