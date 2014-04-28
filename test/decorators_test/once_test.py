@@ -30,7 +30,7 @@ class DefaultSessionTest(TestCase):
         self.assertEqual(3, add(1, 2))
         self.assertEqual(2, mul(1, 2))
         
-    def test_not_enabled(self):
+    def test_disabled(self):
         self.useFixture(MonkeyPatch('decorated.decorators.once.ENABLED', False))
         @Once
         def foo(a, b):

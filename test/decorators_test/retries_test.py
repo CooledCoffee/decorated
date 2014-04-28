@@ -43,7 +43,7 @@ class RetriesTest(TestCase):
             def bar():
                 pass
             
-    def test_not_enabled(self):
+    def test_disabled(self):
         self.useFixture(MonkeyPatch('decorated.decorators.retries.ENABLED', False))
         @Retries(3)
         def foo():

@@ -37,7 +37,7 @@ class FunctionTest(TestCase):
         self.assertEqual(1, foo(1, 1))
         self.assertIsNone(foo(2, 2))
         
-    def test_not_enabled(self):
+    def test_disabled(self):
         self.useFixture(MonkeyPatch('decorated.decorators.conditional.ENABLED', False))
         @Conditional(condition='a == 1')
         def foo(a, b):
