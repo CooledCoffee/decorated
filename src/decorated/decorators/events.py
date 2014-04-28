@@ -6,7 +6,7 @@ from decorated.util import modutil
 from six import with_metaclass
 import doctest
 
-_ENABLED = False
+ENABLED = False
 
 class EventMetaType(type):
     def __init__(self, name, bases, attrs):
@@ -37,13 +37,13 @@ class Event(with_metaclass(EventMetaType, Function)):
     
     @classmethod
     def fire(cls, data=None):
-        if _ENABLED:
+        if ENABLED:
             data = data or {}
             cls._execute_before_listeners(data)
             cls._execute_after_listeners(data)
     
     def _call(self, *args, **kw):
-        if not _ENABLED:
+        if not ENABLED:
             return super(Event, self)._call(*args, **kw)
         
         data = self._get_field_values(None, *args, **kw)
@@ -86,7 +86,7 @@ class Event(with_metaclass(EventMetaType, Function)):
         
 class EventListener(RemoveExtraArgs):
     def _call(self, *args, **kw):
-        if not _ENABLED:
+        if not ENABLED:
             return super(EventListener, self)._call(*args, **kw)
         return super(EventListener, self)._call(*args, **kw)
         
@@ -116,10 +116,10 @@ class EventError(Exception): pass
 
 @Once
 def init(*packages):
-    global _ENABLED
+    global ENABLED
     for p in packages:
         modutil.load_tree(p)
-    _ENABLED = True
+    ENABLED = True
 
 def _get_full_name(func):
     '''

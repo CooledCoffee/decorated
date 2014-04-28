@@ -10,7 +10,7 @@ class FooEvent(Event):
 class EventTest(TestWithFixtures):
     def setUp(self):
         super(EventTest, self).setUp()
-        self.useFixture(MonkeyPatch('decorated.decorators.events._ENABLED', True))
+        self.useFixture(MonkeyPatch('decorated.decorators.events.ENABLED', True))
         FooEvent._sources = []
         FooEvent._after_listeners = []
         
