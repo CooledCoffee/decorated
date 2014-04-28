@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from decorated.decorators.timeout import Timeout, TimeoutError, TimeoutDecorator
-from unittest.case import TestCase
+from fixtures._fixtures.monkeypatch import MonkeyPatch
+from fixtures2 import TestCase
 import signal
 import time
 
@@ -38,6 +39,11 @@ class TimeoutTest(TestCase):
                         time.sleep(10)
                 time.sleep(10)
         self.assertEquals(signal.SIG_DFL, signal.getsignal(signal.SIGALRM))
+        
+    def test_not_enabled(self):
+        self.useFixture(MonkeyPatch('decorated.decorators.timeout.ENABLED', False))
+        with Timeout(1):
+            time.sleep(2)
                 
 class TimeoutDecoratorTest(TestCase):
     def test(self):

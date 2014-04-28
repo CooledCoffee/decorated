@@ -3,6 +3,8 @@ from decorated.base.function import Function
 import signal
 import time
 
+ENABLED = True
+
 class TimeoutError(Exception):
     pass
 
@@ -13,7 +15,7 @@ class Timeout(object):
         self._old_alarm_time = None
         
     def __enter__(self):
-        if self._seconds != 0:
+        if ENABLED and self._seconds != 0:
             self._old_handler = signal.getsignal(signal.SIGALRM)
             def _timeout(*args):
                 raise TimeoutError()
@@ -24,6 +26,9 @@ class Timeout(object):
         return self
     
     def __exit__(self, *args):
+        if not ENABLED:
+            return
+        
         signal.alarm(0)
         if self._old_handler is not None:
             signal.signal(signal.SIGALRM, self._old_handler)
