@@ -2,11 +2,11 @@
 from decorated.base.function import Function
 from decorated.util import modutil, templates
 
-_ENABLED = True
+ENABLED = True
 
 class BaseDecorator(Function):
     def _call(self, *args, **kw):
-        if _ENABLED:
+        if ENABLED:
             d = dict(self._extra_vars)
             d.update(self._resolve_args(*args, **kw))
             key = self._key.eval(d)
