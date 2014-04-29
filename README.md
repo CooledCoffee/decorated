@@ -3,10 +3,6 @@ Installation
 
 pip install decorated
 
-or
-
-easy_install decorated
-
 Introduction
 ============
 
