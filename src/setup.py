@@ -17,7 +17,7 @@ setup(
     ],
     description='Decorator framework and common decorators for python.',
     extras_require={
-        'test': ['fixtures'],
+        'test': ['fixtures2'],
     },
     install_requires=[
         'six',
