@@ -3,7 +3,7 @@ from distutils.core import setup
 
 setup(
     name='decorated',
-    version='1.4.5',
+    version='1.4.6',
     author='Mengchen LEE',
     author_email='CooledCoffee@gmail.com',
     classifiers = [
