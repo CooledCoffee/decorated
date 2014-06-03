@@ -95,10 +95,30 @@ However, if all decorators (@cache, @another\_decorator\_1, @another\_decorator\
 Applying on Class Methods
 -------------------------
 
+For normal method:
+
 	class Foo(object):
 	    @cache
 	    def bar(self):
 	        pass
+
+For static method:
+
+	class Foo(object):
+	    @staticmethod
+	    @cache
+	    def bar():
+	        pass
+
+For class method:
+
+	class Foo(object):
+	    @classmethod
+	    @cache
+	    def bar(cls):
+	        pass
+
+Note that the @staticmethod/@classmethod should always be the outermost.
 
 Decorators
 ==========
