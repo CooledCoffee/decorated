@@ -92,6 +92,34 @@ The situation is even more complicated if the target function is encapsured by m
 Now it is extremely difficult for a traditional @cache to get the name argument.
 However, if all decorators (@cache, @another\_decorator\_1, @another\_decorator\_2 & @another\_decorator\_3) are derived from the Function class, you won't need to change any code for the cache decorator.
 
+Applying on Class Methods
+-------------------------
+
+For normal method:
+
+	class Foo(object):
+	    @cache
+	    def bar(self):
+	        pass
+
+For static method:
+
+	class Foo(object):
+	    @staticmethod
+	    @cache
+	    def bar():
+	        pass
+
+For class method:
+
+	class Foo(object):
+	    @classmethod
+	    @cache
+	    def bar(cls):
+	        pass
+
+Note that the @staticmethod/@classmethod should always be the outermost.
+
 Decorators
 ==========
 
