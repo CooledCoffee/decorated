@@ -106,6 +106,23 @@ class Function(Proxy):
         d = {k: v for k, v in d.items() if k in self.params}
         return d
     
+class WrapperFunction(Function):
+    def _call(self, *args, **kw):
+        self._before(*args, **kw)
+        try:
+            result = super(WrapperFunction, self)._call(*args, **kw)
+            self._after(result, None, *args, **kw)
+            return result
+        except Exception as e:
+            self._after(None, e, *args, **kw)
+            raise e
+    
+    def _before(self, *args, **kw):
+        pass
+    
+    def _after(self, ret, error, *args, **kw):
+        pass
+    
 def partial(func, init_args=(), init_kw=None, call_args=(), call_kw=None):
     if init_kw is None:
         init_kw = {}
