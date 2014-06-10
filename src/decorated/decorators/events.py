@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from decorated.base.function import Function
+from decorated.base.function import Function, WrapperFunction
 from decorated.decorators.once import Once
 from decorated.decorators.remove_extra_args import RemoveExtraArgs
 from decorated.util import modutil
@@ -31,7 +31,7 @@ class EventMetaType(type):
     def name(self):
         return _get_full_name(self)
     
-class Event(with_metaclass(EventMetaType, Function)):
+class Event(with_metaclass(EventMetaType, WrapperFunction)):
     fields = ()
     ret_field = None
     
@@ -41,20 +41,18 @@ class Event(with_metaclass(EventMetaType, Function)):
             data = data or {}
             cls._execute_before_listeners(data)
             cls._execute_after_listeners(data)
-    
-    def _call(self, *args, **kw):
+            
+    def _after(self, ret, error, *args, **kw):
         if not ENABLED:
-            return super(Event, self)._call(*args, **kw)
-        
-        data = self._get_field_values(None, *args, **kw)
-        self._execute_before_listeners(data)
-        
-        ret = super(Event, self)._call(*args, **kw)
-        
+            return
         data = self._get_field_values(ret, *args, **kw)
         self._execute_after_listeners(data)
-        
-        return ret
+            
+    def _before(self, *args, **kw):
+        if not ENABLED:
+            return
+        data = self._get_field_values(None, *args, **kw)
+        self._execute_before_listeners(data)
     
     def _decorate(self, func):
         super(Event, self)._decorate(func)
@@ -85,11 +83,6 @@ class Event(with_metaclass(EventMetaType, Function)):
                 raise EventError('Missing field "%s" in "%s".' % (field, type(self).name))
         
 class EventListener(RemoveExtraArgs):
-    def _call(self, *args, **kw):
-        if not ENABLED:
-            return super(EventListener, self)._call(*args, **kw)
-        return super(EventListener, self)._call(*args, **kw)
-        
     def _decorate(self, func):
         super(EventListener, self)._decorate(func)
         self._validate()
@@ -112,7 +105,8 @@ class BeforeEventListener(EventListener):
     def _register(self):
         self._event_class._before_listeners.append(self)
     
-class EventError(Exception): pass
+class EventError(Exception):
+    pass
 
 @Once
 def init(*packages):
