@@ -123,6 +123,14 @@ class WrapperFunction(Function):
     def _after(self, ret, error, *args, **kw):
         pass
     
+class ContextFunction(WrapperFunction):
+    def __enter__(self):
+        self._before()
+        return self
+    
+    def __exit__(self, error_type, error_value, traceback):
+        self._after(None, error_value)
+    
 def partial(func, init_args=(), init_kw=None, call_args=(), call_kw=None):
     if init_kw is None:
         init_kw = {}
