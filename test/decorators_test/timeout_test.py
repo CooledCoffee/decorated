@@ -45,11 +45,3 @@ class TimeoutTest(TestCase):
         with Timeout(1):
             time.sleep(2)
             
-class TimeoutDecoratorTest(TestCase):
-    def test(self):
-        @Timeout(1)
-        def foo():
-            time.sleep(10)
-        with self.assertRaises(TimeoutError):
-            foo()
-            

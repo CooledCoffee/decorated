@@ -79,3 +79,18 @@ class WithTest(TestCase):
         self.assertTrue(self.after_called)
         self.assertIsInstance(self.error, Exception)
         
+    def test_init(self):
+        # set up
+        class TestFunction(ContextFunction):
+            def _init(self, a):
+                WithTest.a = a
+            def _before(self, *args, **kw):
+                pass
+            def _after(self, ret, error, *args, **kw):
+                pass
+        
+        # test
+        with TestFunction(1):
+            pass
+        self.assertEqual(1, self.a)
+        
