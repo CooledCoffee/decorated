@@ -1,32 +1,30 @@
 # -*- coding: utf-8 -*-
-from decorated.base.function import Function
+from decorated.base.function import ContextFunction
 import signal
 import time
 
 ENABLED = True
 
-class TimeoutError(Exception):
-    pass
-
-class Timeout(object):
-    def __init__(self, seconds):
+class Timeout(ContextFunction):
+    def _init(self, seconds):
         self._seconds = seconds
         self._old_handler = None
         self._old_alarm_time = None
         
-    def __enter__(self):
-        if ENABLED and self._seconds != 0:
-            self._old_handler = signal.getsignal(signal.SIGALRM)
-            def _timeout(*args):
-                raise TimeoutError()
-            signal.signal(signal.SIGALRM, _timeout)
-            old_alarm = signal.alarm(self._seconds)
-            if old_alarm != 0:
-                self._old_alarm_time = time.time() + old_alarm
-        return self
+    def _before(self):
+        if not ENABLED or self._seconds == 0:
+            return
+        
+        self._old_handler = signal.getsignal(signal.SIGALRM)
+        def _timeout(*args):
+            raise TimeoutError()
+        signal.signal(signal.SIGALRM, _timeout)
+        old_alarm = signal.alarm(self._seconds)
+        if old_alarm != 0:
+            self._old_alarm_time = time.time() + old_alarm
     
-    def __exit__(self, *args):
-        if not ENABLED:
+    def _after(self, ret, error):
+        if not ENABLED or self._seconds == 0:
             return
         
         signal.alarm(0)
@@ -40,11 +38,5 @@ class Timeout(object):
                 remain_seconds = 1
             signal.alarm(remain_seconds)
     
-class TimeoutDecorator(Function):
-    def _init(self, seconds):
-        super(TimeoutDecorator, self)._init()
-        self._seconds = seconds
-        
-    def _call(self, *args, **kw):
-        with Timeout(self._seconds):
-            return super(TimeoutDecorator, self)._call(*args, **kw)
+class TimeoutError(Exception):
+    pass

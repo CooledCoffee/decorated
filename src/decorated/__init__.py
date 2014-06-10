@@ -7,7 +7,7 @@ from decorated.decorators.once import Once, OnceSession
 from decorated.decorators.remove_extra_args import RemoveExtraArgs
 from decorated.decorators.retries import Retries
 from decorated.decorators.synchronized import Synchronized
-from decorated.decorators.timeout import TimeoutDecorator
+from decorated.decorators.timeout import Timeout
 
 Function = Function
 partial = partial
@@ -20,4 +20,4 @@ OnceSession = OnceSession
 remove_extra_args = RemoveExtraArgs
 retries = Retries
 synchronized = Synchronized
-timeout = TimeoutDecorator
+timeout = Timeout

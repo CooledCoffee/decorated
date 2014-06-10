@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from decorated.decorators.timeout import Timeout, TimeoutError, TimeoutDecorator
+from decorated.decorators.timeout import Timeout, TimeoutError
 from fixtures._fixtures.monkeypatch import MonkeyPatch
 from fixtures2 import TestCase
 import signal
@@ -44,10 +44,10 @@ class TimeoutTest(TestCase):
         self.useFixture(MonkeyPatch('decorated.decorators.timeout.ENABLED', False))
         with Timeout(1):
             time.sleep(2)
-                
+            
 class TimeoutDecoratorTest(TestCase):
     def test(self):
-        @TimeoutDecorator(1)
+        @Timeout(1)
         def foo():
             time.sleep(10)
         with self.assertRaises(TimeoutError):
