@@ -306,6 +306,15 @@ timeout
 		
 A TimeoutError will be raised if foo takes more than 60 seconds.
 
+You can also achieve the same function by:
+
+	from decorated import timeout
+	import time
+	
+	def foo():
+	    with timeout(60):
+	        time.sleep(120)
+
 events
 ------
 
