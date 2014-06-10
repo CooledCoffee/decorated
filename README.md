@@ -3,15 +3,13 @@ Installation
 
 pip install decorated
 
-Introduction
-============
-
-Decorated aims to ease the uses of decorators. It provides a fundemental class "Function" that is similar to the standard python "function". You can derive your decorator from this Function class.
+Problems with Traditional Decorators
+====================================
 
 Different Forms of Decorators
 -----------------------------
 
-One major problem with normal decorators is that they come in two forms:
+Decorators with and without arguments are very different in implementation.
 
 a) without arguments:
 
@@ -21,76 +19,102 @@ a) without arguments:
 		
 b) with arguments:
 
-	@cache(expires=86400)
+	@cache(key='myfoo')
 	def foo():
 	    pass
-	    
-Now it is difficult for the cache decorator to handle both situations. Of course you can change the first form to
-
-	@cache()
-	def foo():
-	    pass
-	
-But it is not only ugly but also prune to mistake.
-
-Now if you use Function to implement the decorator, it will be something like this:
-
-	class cache(Function):
-	    def _init(self, expires=3600):
-	        self._expires = expires
-	        
-	    def _call(self, *args, **kw):
-	        # if cached then return directly
-	        ...
-	    	result = super(cache, self)._call(*args, **kw)
-	    	# cache the result
-	    	...
-	    	return result
-
-The Function class make sure both _init and _call are called in all situations.
 
 Accessing Arguments
 -------------------
 
-Another common issue with decorators is accessing arguments of the target function. For example:
+You can access the arguments of the wrapped function.
+You can also get the parameter names using the inspect module.
+However, it is not a minor problem putting these two pieces of information together and figuring out which argument is for which parameter.
 
-	@cache
-	def foo(name):
-	    pass
-		
-	@cache
-	def bar(id, name):
-	    pass
-		
-Suppose the cache decorator uses the name argument as the cache key. It does have access to the arguments. But they usually come in the forms of \*args and \*\*kw. You have to figure out which one is the "name" by yourself. This is not convenient.
-
-The \_resolve_args method in the Function class will do it for you:
-
-	class cache(Function):
-	    def _call(self, *args, **kw):
-	        arguments = self._resolve_args(*args, **kw) # the resulting arguments is a dict
-	        key = arguments['name']
-	        # below is the normal caching logic
-	        ...
-	        
 Multi-level Decorators
 ----------------------
 
-The situation is even more complicated if the target function is encapsured by multi decorators:
+You can wrap a function with multi decorators:
 
-	@cache
-	@another_decorator_1
-	def foo(name):
-	    pass
-		
-	@cache
-	@another_decorator_2
-	@another_decorator_3
-	def bar(id, name):
+	@timeout(seconds=30)
+	def foo(a, b=0):
 	    pass
 	    
-Now it is extremely difficult for a traditional @cache to get the name argument.
-However, if all decorators (@cache, @another\_decorator\_1, @another\_decorator\_2 & @another\_decorator\_3) are derived from the Function class, you won't need to change any code for the cache decorator.
+	@timeout(seconds=30)
+	@cache
+	def bar(c, d=0)
+	    pass
+
+However, this add even more difficulties to the previous problem.
+
+Solution
+========
+
+Decorated solves all the above problems and more.
+The core of decorated is a class called "Function" that is similar to the standard python "function".
+You can derive your decorators from it.
+
+First Example
+-------------
+
+	from decorated import Function
+	
+	class cache(Function):
+	    items = {}
+	    
+	    def _init(self, key=None):
+	        self._key = key
+	        
+	    def _decorate(self, func):
+	        if self._key is None:
+	            self._key = func.__name__
+	        return super(cache, self)._decorate(func)
+	        
+	    def _call(self, *args, **kw):
+	        d = self._resolve_args(*args, **kw)
+	        key = '|'.join([self._key, d['id']])
+	        if key in cache.items:
+	            return cache.items[key]
+	        result = super(cache, self)._call(*args, **kw)
+	        cache.items[key] = result
+	        return result
+	
+	# without init argument
+	@cache
+	def get_user_public_info(id, timestamp=None):
+	    return {
+	        'id': id,
+	        'name': 'Timmy',
+	        'timestamp': timestamp,
+	    }
+	
+	# with init argument
+	@cache('private_user_info')
+	def get_user_private_info(token, id, timestamp=None):
+	    return {
+	        'id': id,
+	        'email': 'timmy@disney.com',
+	        'timestamp': timestamp,
+	    }
+	
+	print(get_user_public_info('1'))
+	print(get_user_public_info('2', timestamp=12345))
+	print(get_user_private_info('11111', '1'))
+	print(get_user_private_info('22222', '2', timestamp=12345))
+
+The workflow of Function can be decomposed into three phases:
+
+a) init:
+in this phase, a new instance of the cache class is instantiated.
+You can deal with init arguments here, but have no access to the target function yet.
+
+b) decorate:
+this is where the decoration actually takes place.
+In this phase, you gain access to the target function and do some extra init work.
+The return value (usually self) is used as the wrapped function.
+
+c) call:
+this is executed together with the arguments (\*args & \*\*kw) whenever the function is called.
+Usually you will need the \_resolve\_args method to parse the arguments into a dict.
 
 Applying on Class Methods
 -------------------------
@@ -120,10 +144,30 @@ For class method:
 
 Note that the @staticmethod/@classmethod should always be the outermost.
 
-Decorators
-==========
+Context Function
+----------------
 
-Decorated comes with some common decorators.
+Context managers are similar with decorators in that they both wrap a block of code.
+Sometimes you may need both of them for the same functionality.
+For example, you may need timeout both as decorator and as context manager:
+
+	@timeout(60)
+	def foo():
+		pass
+	
+	def bar():
+	    with timeout(60):
+	        pass
+	        
+In this case, you can derive the timeout from ContextFunction
+and override the \_before & \_after methods.
+In fact, there is a built-in timeout decorator in the decorated package.
+Check out the code for more information.
+
+Built-in Decorators
+===================
+
+Decorated comes with some built-in decorators.
 
 cache
 -----
