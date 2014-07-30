@@ -111,11 +111,11 @@ class WrapperFunction(Function):
         self._before(*args, **kw)
         try:
             result = super(WrapperFunction, self)._call(*args, **kw)
-            self._after(result, None, *args, **kw)
-            return result
         except Exception as e:
             self._after(None, e, *args, **kw)
             raise e
+        self._after(result, None, *args, **kw)
+        return result
     
     def _before(self, *args, **kw):
         pass
