@@ -90,9 +90,13 @@ class MethodTest(TestCase):
             @Function
             def bar(self, a, b=0):
                 return a + b
+        class Foo2(Foo):
+            pass
         self.assertEqual(Foo.bar, Foo.bar)
+        self.assertEqual(Foo2.bar, Foo2.bar)
+        self.assertNotEqual(Foo.bar, Foo2.bar)
         foo = Foo()
         self.assertEqual(foo.bar, foo.bar)
-        del foo
-        self.assertEqual(0, len(Foo.bar._instance_cache))
+        foo2 = Foo2()
+        self.assertEqual(foo2.bar, foo2.bar)
         

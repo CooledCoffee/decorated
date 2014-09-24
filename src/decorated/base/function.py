@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
 from decorated.base.proxy import Proxy, NoTargetError
 from decorated.util import templates
-from weakref import WeakKeyDictionary
 import doctest
 import functools
 import inspect
@@ -15,8 +14,6 @@ class Function(Proxy):
         self.optional_params = None
         self._func = None
         self._decorate_or_call = self._decorate
-        self._static_cache = {}
-        self._instance_cache = WeakKeyDictionary()
         if len(args) == 1 and callable(args[0]) and len(kw) == 0:
             self._init()
             self._decorate(args[0])
@@ -27,17 +24,22 @@ class Function(Proxy):
         return self._decorate_or_call(*args, **kw)
     
     def __get__(self, obj, cls):
-        cache = self._static_cache if obj is None else self._instance_cache
-        key = obj or cls
-        cached = cache.get(key)
-        if cached is not None:
-            return cached
-        call_args = (obj,) if obj is not None else ()
-        method = partial(Function, call_args=call_args)(self)
+        if obj is None:
+            cache = cls.__dict__.get('__decorated_cache__')
+            if cache is None:
+                cache = {}
+                setattr(cls, '__decorated_cache__', cache)
+            method = cache.get(self.__name__)
+            if method is not None:
+                return method
+            method = Function(self)
+            cache[self.__name__] = method
+        else:
+            method = partial(Function, call_args=(obj,))(self)
+            setattr(obj, self.__name__, method)
         method.im_class = cls
         method.im_func = method.__func__ = self
         method.im_self = method.__self__ = obj
-        cache[key] = method
         return method
     
     def __str__(self):
