@@ -20,7 +20,7 @@ class Retries(Function):
                 return super(Retries, self)._call(*args, **kw)
             except Exception as e:
                 last_error = e
-                if i != self._times:
+                if i < self._times - 1:
                     time.sleep(self._delay)
         else:
             raise last_error
