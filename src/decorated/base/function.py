@@ -106,7 +106,7 @@ class WrapperFunction(Function):
             result = super(WrapperFunction, self)._call(*args, **kw)
         except Exception as e:
             self._after(None, e, *args, **kw)
-            raise e
+            raise
         self._after(result, None, *args, **kw)
         return result
     

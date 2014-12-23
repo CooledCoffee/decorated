@@ -34,14 +34,14 @@ class Context(Dict):
     def __getattr__(self, name):
         try:
             return super(Context, self).__getattr__(name)
-        except AttributeError as e:
+        except AttributeError:
             if self._parent:
                 try:
                     return getattr(self._parent, name)
                 except AttributeError:
-                    raise e
+                    raise
             else:
-                raise e
+                raise
             
     def __getitem__(self, name):
         raise NotImplementedError()
