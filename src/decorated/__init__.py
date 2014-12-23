@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from decorated.base.context import Context
 from decorated.base.function import Function, partial, WrapperFunction, \
     ContextFunction
 from decorated.decorators.conditional import Conditional
@@ -10,6 +11,8 @@ from decorated.decorators.retries import Retries
 from decorated.decorators.synchronized import Synchronized
 from decorated.decorators.tempfile import TempFile, TempDir
 from decorated.decorators.timeout import Timeout
+
+Contxt = Context
 
 Function = Function
 WrapperFunction = WrapperFunction
