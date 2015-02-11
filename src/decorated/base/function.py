@@ -130,6 +130,9 @@ def partial(func, init_args=(), init_kw=None, call_args=(), call_kw=None):
     if call_kw is None:
         call_kw = {}
     class _PartialFunction(func):
+        def __str__(self):
+            return '<PartialFunction %s.%s>' % (self._func.__module__, self.__name__)
+    
         def _init(self, *args, **kw):
             args = tuple(init_args) + args
             kw.update(init_kw)

@@ -11,6 +11,12 @@ class FullDecorator(Function):
 def foo(d, e, f=None):
     return d + e + f
 
+class StrTest(TestCase):
+    def test(self):
+        partial_decorator = partial(FullDecorator)
+        decorated = partial_decorator(1, 2, 3)(foo)
+        self.assertEqual('<PartialFunction base_test.function_test.partial_test.foo>', str(decorated))
+
 class InitTest(TestCase):
     def test_with_nothing(self):
         partial_decorator = partial(FullDecorator)
