@@ -53,6 +53,22 @@ class MethodTest(TestCase):
         self.assertEqual(('self', 'a', 'b'), foo.bar.__func__.params)
         self.assertEquals(3, foo.bar(1, b=2))
         
+    def test_non_call(self):
+        # set up
+        class TestFunction(Function):
+            def bar2(self, foo):
+                MethodTest.foo = foo
+                return 2
+        class Foo(object):
+            @TestFunction
+            def bar(self, a, b=0):
+                return a + b
+        
+        # test
+        foo = Foo()
+        self.assertEqual(2, foo.bar.bar2())
+        self.assertIsInstance(self.foo, Foo)
+        
     def test_static_method(self):
         # set up
         class Foo(object):

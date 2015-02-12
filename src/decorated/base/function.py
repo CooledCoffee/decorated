@@ -130,6 +130,18 @@ def partial(func, init_args=(), init_kw=None, call_args=(), call_kw=None):
     if call_kw is None:
         call_kw = {}
     class _PartialFunction(func):
+        def __getattr__(self, name):
+            attr = getattr(self._func, name)
+            if callable(attr):
+                method = attr
+                def _wrapper(*args, **kw):
+                    args = tuple(call_args) + args
+                    merged_kw = dict(call_kw)
+                    merged_kw.update(kw)
+                    return method(*args, **merged_kw)
+                attr = _wrapper
+            return attr
+        
         def __str__(self):
             return '<PartialFunction %s.%s>' % (self._func.__module__, self.__name__)
     
