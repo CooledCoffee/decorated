@@ -4,7 +4,6 @@ from decorated.base.function import Function, partial, WrapperFunction, \
     ContextFunction
 from decorated.decorators.conditional import Conditional
 from decorated.decorators.events import Event
-from decorated.decorators.ignore_error import IgnoreError
 from decorated.decorators.instantiate import Instantiate
 from decorated.decorators.once import Once, OnceSession
 from decorated.decorators.remove_extra_args import RemoveExtraArgs
@@ -23,7 +22,6 @@ partial = partial
 
 Event = Event
 conditional = Conditional
-ignore_error = IgnoreError
 instantiate = Instantiate
 once = Once
 OnceSession = OnceSession

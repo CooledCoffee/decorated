@@ -14,11 +14,11 @@ class Function(Proxy):
         self.optional_params = None
         self._func = None
         self._decorate_or_call = self._decorate
-        if len(args) == 1 and callable(args[0]) and len(kw) == 0:
+        if self._is_init_args(*args, **kw):
+            self._init(*args, **kw)
+        else:
             self._init()
             self._decorate(args[0])
-        else:
-            self._init(*args, **kw)
             
     def __call__(self, *args, **kw):
         return self._decorate_or_call(*args, **kw)
@@ -71,6 +71,9 @@ class Function(Proxy):
     def _init(self, *args, **kw):
         pass
     
+    def _is_init_args(self, *args, **kw):
+        return len(args) != 1 or not callable(args[0]) or len(kw) != 0
+        
     def _parse_params(self, func):
         self.params, _, _, defaults = inspect.getargspec(func)
         if defaults:
