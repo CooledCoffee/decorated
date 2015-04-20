@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from decorated.decorators.events import Event, EventError
-from fixtures._fixtures.monkeypatch import MonkeyPatch
+from decorated.decorators.events import Event, EventError, event
 from fixtures.testcase import TestWithFixtures
 
 class FooEvent(Event):
@@ -10,7 +9,6 @@ class FooEvent(Event):
 class EventTest(TestWithFixtures):
     def setUp(self):
         super(EventTest, self).setUp()
-        self.useFixture(MonkeyPatch('decorated.decorators.events.ENABLED', True))
         FooEvent._sources = []
         FooEvent._after_listeners = []
         
@@ -113,4 +111,21 @@ class FireTest(EventTest):
             self.called.append(z)
         FooEvent.fire({'a': 1, 'z': 3})
         self.assertEquals([1, 1, 3], self.called)
+        
+class BuilderTest(EventTest):
+    def test(self):
+        self.called = []
+        foo_event = event(('a', 'b'), event_ret_field='z')
+        @foo_event
+        def foo(a, b):
+            return a + b
+        @foo_event.before
+        def before_foo(a):
+            self.called.append(a)
+        @foo_event.after
+        def after_foo1(a):
+            self.called.append(a)
+        result = foo(1, 2)
+        self.assertEqual(3, result)
+        self.assertEquals([1, 1], self.called)
         

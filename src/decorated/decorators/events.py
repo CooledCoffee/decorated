@@ -56,7 +56,7 @@ class Event(with_metaclass(EventMetaType, WrapperFunction)):
     def _get_field_values(self, ret, *args, **kw):
         values = self._resolve_args(*args, **kw)
         values = {k: v for k, v in values.items() if k in self.fields}
-        if self.ret_field:
+        if self.ret_field is not None:
             values[self.ret_field] = ret
         return values
     
@@ -100,6 +100,12 @@ class BeforeEventListener(EventListener):
     
 class EventError(Exception):
     pass
+
+def event(event_fields, event_ret_field=None):
+    class _Event(Event):
+        fields = event_fields
+        ret_field = event_ret_field
+    return _Event
 
 @Once
 def init(*packages):

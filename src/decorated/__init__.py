@@ -2,6 +2,7 @@
 from decorated.base.context import Context, ctx
 from decorated.base.function import Function, partial, WrapperFunction, \
     ContextFunction
+from decorated.decorators import events
 from decorated.decorators.conditional import Conditional
 from decorated.decorators.events import Event
 from decorated.decorators.instantiate import Instantiate
@@ -20,8 +21,9 @@ WrapperFunction = WrapperFunction
 ContextFunction = ContextFunction
 partial = partial
 
-Event = Event
 conditional = Conditional
+event = events.event
+Event = Event
 instantiate = Instantiate
 once = Once
 OnceSession = OnceSession
