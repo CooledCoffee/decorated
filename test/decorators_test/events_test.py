@@ -81,7 +81,7 @@ class EventListenerValidateTest(EventTest):
                 pass
     
 class CallTest(EventTest):
-    def test_normal(self):
+    def test(self):
         self.called = []
         @FooEvent
         def foo(a, b):
@@ -98,28 +98,9 @@ class CallTest(EventTest):
         result = foo(1, 2)
         self.assertEqual(3, result)
         self.assertEquals([1, 1, 3], self.called)
-        
-    def test_disabled(self):
-        self.useFixture(MonkeyPatch('decorated.decorators.events.ENABLED', False))
-        self.called = []
-        @FooEvent
-        def foo(a, b):
-            return a + b
-        @FooEvent.before
-        def before_foo(a):
-            self.called.append(a)
-        @FooEvent.after
-        def after_foo1(a):
-            self.called.append(a)
-        @FooEvent.after
-        def after_foo2(z):
-            self.called.append(z)
-        result = foo(1, 2)
-        self.assertEqual(3, result)
-        self.assertEquals([], self.called)
         
 class FireTest(EventTest):
-    def test_normal(self):
+    def test(self):
         self.called = []
         @FooEvent.before
         def before_foo(a):
@@ -132,19 +113,4 @@ class FireTest(EventTest):
             self.called.append(z)
         FooEvent.fire({'a': 1, 'z': 3})
         self.assertEquals([1, 1, 3], self.called)
-        
-    def test_disabled(self):
-        self.useFixture(MonkeyPatch('decorated.decorators.events.ENABLED', False))
-        self.called = []
-        @FooEvent.before
-        def before_foo(a):
-            self.called.append(a)
-        @FooEvent.after
-        def after_foo1(a):
-            self.called.append(a)
-        @FooEvent.after
-        def after_foo2(z):
-            self.called.append(z)
-        FooEvent.fire({'a': 1, 'z': 3})
-        self.assertEquals([], self.called)
         

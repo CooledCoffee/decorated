@@ -40,8 +40,3 @@ class TimeoutTest(TestCase):
                 time.sleep(10)
         self.assertEquals(signal.SIG_DFL, signal.getsignal(signal.SIGALRM))
         
-    def test_disabled(self):
-        self.useFixture(MonkeyPatch('decorated.decorators.timeout.ENABLED', False))
-        with Timeout(1):
-            time.sleep(2)
-            

@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-from decorated.base.function import Function, WrapperFunction
+from decorated.base.function import WrapperFunction
 from decorated.decorators.once import Once
 from decorated.decorators.remove_extra_args import RemoveExtraArgs
 from decorated.util import modutil
 from six import with_metaclass
 import doctest
-
-ENABLED = False
 
 class EventMetaType(type):
     def __init__(self, name, bases, attrs):
@@ -37,20 +35,15 @@ class Event(with_metaclass(EventMetaType, WrapperFunction)):
     
     @classmethod
     def fire(cls, data=None):
-        if ENABLED:
-            data = data or {}
-            cls._execute_before_listeners(data)
-            cls._execute_after_listeners(data)
+        data = data or {}
+        cls._execute_before_listeners(data)
+        cls._execute_after_listeners(data)
             
     def _after(self, ret, error, *args, **kw):
-        if not ENABLED:
-            return
         data = self._get_field_values(ret, *args, **kw)
         self._execute_after_listeners(data)
             
     def _before(self, *args, **kw):
-        if not ENABLED:
-            return
         data = self._get_field_values(None, *args, **kw)
         self._execute_before_listeners(data)
     
@@ -110,10 +103,8 @@ class EventError(Exception):
 
 @Once
 def init(*packages):
-    global ENABLED
     for p in packages:
         modutil.load_tree(p)
-    ENABLED = True
 
 def _get_full_name(func):
     '''

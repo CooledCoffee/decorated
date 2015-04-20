@@ -42,15 +42,4 @@ class RetriesTest(TestCase):
             @Retries(-1)
             def bar():
                 pass
-            
-    def test_disabled(self):
-        self.useFixture(MonkeyPatch('decorated.decorators.retries.ENABLED', False))
-        @Retries(3)
-        def foo():
-            foo.times += 1
-            raise Exception()
-        foo.times = 0
-        with self.assertRaises(Exception):
-            foo()
-        self.assertEqual(1, foo.times)
         

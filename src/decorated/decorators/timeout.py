@@ -3,8 +3,6 @@ from decorated.base.function import ContextFunction
 import signal
 import time
 
-ENABLED = True
-
 class Timeout(ContextFunction):
     def _init(self, seconds):
         self._seconds = seconds
@@ -12,7 +10,7 @@ class Timeout(ContextFunction):
         self._old_alarm_time = None
         
     def _before(self):
-        if not ENABLED or self._seconds == 0:
+        if self._seconds is None or self._seconds == 0:
             return
         
         self._old_handler = signal.getsignal(signal.SIGALRM)
@@ -24,7 +22,7 @@ class Timeout(ContextFunction):
             self._old_alarm_time = time.time() + old_alarm
     
     def _after(self, ret, error):
-        if not ENABLED or self._seconds == 0:
+        if self._seconds is None or self._seconds == 0:
             return
         
         signal.alarm(0)

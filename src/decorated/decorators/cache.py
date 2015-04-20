@@ -2,17 +2,12 @@
 from decorated.base.function import Function
 from decorated.util import templates
 
-ENABLED = True
-
 class BaseDecorator(Function):
     def _call(self, *args, **kw):
-        if ENABLED:
-            d = dict(self._extra_vars)
-            d.update(self._resolve_args(*args, **kw))
-            key = self._key.eval(d)
-            return self._process(key, *args, **kw)
-        else:
-            return super(BaseDecorator, self)._call(*args, **kw)
+        d = dict(self._extra_vars)
+        d.update(self._resolve_args(*args, **kw))
+        key = self._key.eval(d)
+        return self._process(key, *args, **kw)
         
     def _decorate(self, func):
         super(BaseDecorator, self)._decorate(func)
