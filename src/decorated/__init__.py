@@ -11,6 +11,7 @@ from decorated.decorators.remove_extra_args import RemoveExtraArgs
 from decorated.decorators.retries import Retries
 from decorated.decorators.synchronized import Synchronized
 from decorated.decorators.tempfile import TempFile, TempDir
+from decorated.decorators.timeit import TimeIt
 from decorated.decorators.timeout import Timeout
 
 Contxt = Context
@@ -30,6 +31,7 @@ OnceSession = OnceSession
 remove_extra_args = RemoveExtraArgs
 retries = Retries
 synchronized = Synchronized
-tempfile = TempFile = TempFile
-tempdir = TempDir = TempDir
-timeout = Timeout = Timeout
+tempfile = TempFile
+tempdir = TempDir
+timeit = TimeIt
+timeout = Timeout
