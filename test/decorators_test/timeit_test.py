@@ -38,6 +38,7 @@ class TimeItTest(TestCase):
         self.assertEqual(1, len(timing.timings))
         
     def test_repeats(self):
+        # set up
         @TimeIt(repeats=10, reporter=_reporter)
         def foo(a, b=0):
             foo.times += 1
@@ -53,6 +54,7 @@ class TimeItTest(TestCase):
         self.assertEqual(10, len(timing.timings))
         
     def test_iterations_and_repeats(self):
+        # set up
         @TimeIt(iterations=10, repeats=10, reporter=_reporter)
         def foo(a, b=0):
             foo.times += 1

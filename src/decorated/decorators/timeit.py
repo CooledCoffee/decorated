@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 from decorated.base.function import Function
+from decorated.util import reporters
+from decorated.util.gcutil import DisableGc
 import doctest
-import logging
-import six
+import gc
 import sys
 import time
-
-log = logging.getLogger(__name__)
-PRINT_REPORTER = six.print_
-LOGGING_REPORTER = log.debug
 
 if sys.platform == "win32":
     # On Windows, the best timer is time.clock()
@@ -20,18 +17,19 @@ else:
 class TimeIt(Function):
     def _call(self, *args, **kw):
         timings = [None] * self._repeats
-        for i in range(self._repeats):
-            begin = timer()
-            for _ in range(self._iterations):
-                result = super(TimeIt, self)._call(*args, **kw)
-            seconds = timer() - begin
-            timings[i] = seconds
+        with DisableGc():
+            for i in range(self._repeats):
+                begin = timer()
+                for _ in range(self._iterations):
+                    result = super(TimeIt, self)._call(*args, **kw)
+                seconds = timer() - begin
+                timings[i] = seconds
         timing = Result(self._func, args, kw, self._iterations,
                 self._repeats, timings)
         self._reporter(timing)
         return result
     
-    def _init(self, iterations=1, repeats=1, reporter=PRINT_REPORTER):
+    def _init(self, iterations=1, repeats=1, reporter=reporters.PRINT_REPORTER):
         super(TimeIt, self)._init()
         self._iterations = iterations
         self._repeats = repeats
