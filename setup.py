@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from distutils.core import setup
+import setuptools
 
 setup(
     name='decorated',
@@ -17,14 +18,10 @@ setup(
     ],
     description='Decorator framework and common decorators for python.',
     install_requires=[
-        'fixtures2 >= 0.1.2',
+        'fixtures2>=0.1.2',
         'six',
     ],
-    packages=[
-        'decorated',
-        'decorated.base',
-        'decorated.decorators',
-        'decorated.util',
-    ],
+    package_dir={'': 'src'},
+    packages=setuptools.find_packages(where='src'),
     url='https://github.com/CooledCoffee/decorated/',
 )
