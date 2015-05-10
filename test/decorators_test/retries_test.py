@@ -31,11 +31,11 @@ class RetriesTest(TestCase):
         foo.times = 0
         with self.assertRaises(Exception):
             foo()
-        self.assertEqual(3, foo.times)
+        self.assertEqual(4, foo.times)
         
     def test_invalid_times(self):
         with self.assertRaises(Exception):
-            @Retries(0)
+            @Retries(-1)
             def foo():
                 pass
         with self.assertRaises(Exception):

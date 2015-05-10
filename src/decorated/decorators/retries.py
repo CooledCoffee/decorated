@@ -4,13 +4,13 @@ import time
 
 class Retries(Function):
     def _init(self, times, delay=0):
-        if times <= 0:
-            raise Exception('Times should be positive.')
+        if times < 0:
+            raise Exception('Times cannot be negative.')
         self._times = times
         self._delay = delay
         
     def _call(self, *args, **kw):
-        for i in range(self._times):
+        for i in range(self._times + 1):
             try:
                 return super(Retries, self)._call(*args, **kw)
             except Exception as e:
