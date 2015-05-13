@@ -13,3 +13,5 @@ dist
 MANIFEST
 src/decorated.egg-info
 
+*.html
+
