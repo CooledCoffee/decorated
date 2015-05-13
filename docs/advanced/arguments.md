@@ -1,4 +1,4 @@
-# Resolving arguments
+# Accessing target function arguments
 
 It is usually useful to get the arguments of the target function.
 This can be easily achieved by the \_resolve_args method.

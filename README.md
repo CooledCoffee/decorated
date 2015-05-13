@@ -31,12 +31,16 @@ It also provides some built-in decorators that you may find helpful to your dail
 
 &nbsp;&nbsp;&nbsp;&nbsp;3\.4\. [once](docs/decorators/once.md)
 
-&nbsp;&nbsp;&nbsp;&nbsp;3\.5\. [remove\_extra\_args](docs/decorators/remove_extra_args.md)
+&nbsp;&nbsp;&nbsp;&nbsp;3\.5\. [profile](docs/decorators/profile.md)
 
-&nbsp;&nbsp;&nbsp;&nbsp;3\.6\. [retries](docs/decorators/retries.md)
+&nbsp;&nbsp;&nbsp;&nbsp;3\.6\. [remove\_extra\_args](docs/decorators/remove_extra_args.md)
 
-&nbsp;&nbsp;&nbsp;&nbsp;3\.7\. [synchronized](docs/decorators/synchronized.md)
+&nbsp;&nbsp;&nbsp;&nbsp;3\.7\. [retries](docs/decorators/retries.md)
 
-&nbsp;&nbsp;&nbsp;&nbsp;3\.8\. [timeout](docs/decorators/timeout.md)
+&nbsp;&nbsp;&nbsp;&nbsp;3\.8\. [synchronized](docs/decorators/synchronized.md)
+
+&nbsp;&nbsp;&nbsp;&nbsp;3\.9\. [timeit](docs/decorators/timeit.md)
+
+&nbsp;&nbsp;&nbsp;&nbsp;3\.10\. [timeout](docs/decorators/timeout.md)
 
 4\. [Loggingd](docs/loggingd.md)

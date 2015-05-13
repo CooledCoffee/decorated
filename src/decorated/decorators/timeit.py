@@ -3,7 +3,6 @@ from decorated.base.function import Function
 from decorated.util import reporters
 from decorated.util.gcutil import DisableGc
 import doctest
-import gc
 import sys
 import time
 
