@@ -9,7 +9,7 @@ class Timeout(ContextFunction):
         self._old_handler = None
         self._old_alarm_time = None
         
-    def _before(self):
+    def _before(self, *args, **kw):
         if self._seconds is None or self._seconds == 0:
             return
         
@@ -21,7 +21,7 @@ class Timeout(ContextFunction):
         if old_alarm != 0:
             self._old_alarm_time = time.time() + old_alarm
     
-    def _after(self, ret, error):
+    def _after(self, ret, error, *args, **kw):
         if self._seconds is None or self._seconds == 0:
             return
         

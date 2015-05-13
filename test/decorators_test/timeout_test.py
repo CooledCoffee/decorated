@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 from decorated.decorators.timeout import Timeout, TimeoutError
-from fixtures._fixtures.monkeypatch import MonkeyPatch
 from fixtures2 import TestCase
 import signal
 import time
 
-class TimeoutTest(TestCase):
+class ContextTest(TestCase):
     def test_within_timeout(self):
         with Timeout(10):
             pass
@@ -39,4 +38,18 @@ class TimeoutTest(TestCase):
                         time.sleep(10)
                 time.sleep(10)
         self.assertEquals(signal.SIG_DFL, signal.getsignal(signal.SIGALRM))
+        
+class DecoratorTest(TestCase):
+    def test_success(self):
+        @Timeout(1)
+        def foo(a, b=0):
+            pass
+        foo(1, b=2)
+        
+    def test_timeout(self):
+        @Timeout(1)
+        def foo(a, b=0):
+            time.sleep(10)
+        with self.assertRaises(TimeoutError):
+            foo(1, b=2)
         
