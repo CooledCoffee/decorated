@@ -2,46 +2,54 @@
 from decorated.base.function import Function
 from decorated.util import templates
 
-class BaseDecorator(Function):
+class CacheDecorator(Function):
+    @property
+    def invalidate(self):
+        return self._cache.uncache(self._key, **self._extra_vars)
+    
     def _call(self, *args, **kw):
         d = dict(self._extra_vars)
         d.update(self._resolve_args(*args, **kw))
-        key = self._key.eval(d)
+        key = self._key_template.eval(d)
         return self._process(key, *args, **kw)
         
     def _decorate(self, func):
-        super(BaseDecorator, self)._decorate(func)
+        super(CacheDecorator, self)._decorate(func)
         var_names = self.params + tuple(self._extra_vars.keys())
-        self._key = templates.compile(self._key, var_names)
+        self._key_template = templates.compile(self._key, var_names)
         return self
 
     def _init(self, cache, key, extra_vars=None):
-        super(BaseDecorator, self)._init()
+        super(CacheDecorator, self)._init()
         self._cache = cache
         self._key = key
         self._extra_vars = extra_vars or {}
         
     def _process(self, key, *args, **kw):
-        raise NotImplementedError()
+        result = self._cache._get(key)
+        if result is None:
+            result = Function._call(self, *args, **kw)
+            self._cache._set(key, result)
+        return result
     
 class Cache(object):
     def cache(self, key, **kw):
-        class Decorator(BaseDecorator):
+        class _Decorator(CacheDecorator):
             def _process(self, key, *args, **kw):
                 result = self._cache._get(key)
                 if result is None:
                     result = Function._call(self, *args, **kw)
                     self._cache._set(key, result)
                 return result
-        return Decorator(self, key, extra_vars=kw)
+        return _Decorator(self, key, extra_vars=kw)
     
     def uncache(self, key, **kw):
-        class Decorator(BaseDecorator):
+        class _Decorator(CacheDecorator):
             def _process(self, key, *args, **kw):
                 result = Function._call(self, *args, **kw)
                 self._cache._delete(key)
                 return result
-        return Decorator(self, key, extra_vars=kw)
+        return _Decorator(self, key, extra_vars=kw)
     
     def _delete(self, key):
         raise NotImplementedError()

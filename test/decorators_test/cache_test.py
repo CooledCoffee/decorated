@@ -30,18 +30,20 @@ class CacheTest(TestCase):
             return id
         @cache.uncache('/{id}')
         def unfoo(id):
-            pass
+            return id
         
         # test
         self.assertEqual(0, len(cache._data))
         
-        self.assertEqual(1, foo(1))
+        result = foo(1)
+        self.assertEqual(1, result)
         self.assertEqual(1, len(cache._data))
         
         self.assertEqual(1, foo(1))
         self.assertEqual(1, len(cache._data))
         
-        unfoo(1)
+        result = unfoo(1)
+        self.assertEqual(1, result)
         self.assertEqual(0, len(cache._data))
         
         self.assertEqual(1, foo(1))
@@ -64,4 +66,24 @@ class CacheTest(TestCase):
             self.assertIn('/1/2', cache._data)
             unfoo()
             self.assertNotIn('/1/2', cache._data)
+        
+    def test_invalidate(self):
+        # set up
+        cache = SimpleCache()
+        foo_cache = cache.cache('/{id}')
+        @foo_cache
+        def foo(id):
+            pass
+        @foo_cache.invalidate
+        def unfoo(id):
+            pass
+        
+        # test
+        self.assertEqual(0, len(cache._data))
+        
+        foo(1)
+        self.assertEqual(1, len(cache._data))
+        
+        unfoo(1)
+        self.assertEqual(0, len(cache._data))
         
