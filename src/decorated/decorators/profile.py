@@ -18,13 +18,15 @@ class Profile(Function):
         profile.create_stats()
         stats = Stats(profile)
         stats.sort_stats('cumulative')
+        stats.fcn_list = stats.fcn_list[:self._max_lines]
         self._reporter(stats)
         return _run.result
     
-    def _init(self, iterations=1, reporter=reporters.PRINT_REPORTER):
+    def _init(self, iterations=1, reporter=reporters.PRINT_REPORTER, max_lines=50):
         super(Profile, self)._init()
         self._iterations = iterations
         self._reporter = reporter
+        self._max_lines = max_lines
         
 class Stats(Stats):
     def __str__(self):
