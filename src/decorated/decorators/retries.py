@@ -18,5 +18,5 @@ class Retries(Function):
                 if i < self._times - 1:
                     time.sleep(self._delay)
         else:
-            raise last_error
+            raise
         
