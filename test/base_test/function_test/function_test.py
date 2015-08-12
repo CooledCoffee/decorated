@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from decorated.base.function import Function
+from decorated.base.function import Function, ArgError
 from decorated.util.templates import Template, TemplateError
 from unittest.case import TestCase
 import inspect
@@ -108,7 +108,7 @@ class ResolveArgsTest(TestCase):
         self.assertEquals(2, d['b'])
         
     def test_missing_arg(self):
-        with self.assertRaises(Exception):
+        with self.assertRaises(ArgError):
             foo._resolve_args()
             
 class EvaluateExpressionTest(TestCase):

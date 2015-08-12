@@ -7,6 +7,11 @@ import inspect
 
 WRAPPER_ASSIGNMENTS = ('__module__', '__name__', '__doc__', '__code__', 'func_code')
 
+class ArgError(Exception):
+    def __init__(self, param, message):
+        super(ArgError, self).__init__(message)
+        self.param = param
+
 class Function(Proxy):
     def __init__(self, *args, **kw):
         self.params = None
@@ -98,7 +103,8 @@ class Function(Proxy):
         d.update(kw)
         for name in self.params:
             if name not in d:
-                raise Exception('Missing argument "%s" for %s.' % (name, str(self)))
+                msg = 'Missing argument "%s" for %s.' % (name, str(self))
+                raise ArgError(name, msg)
         d = {k: v for k, v in d.items() if k in self.params}
         return d
     
