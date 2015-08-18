@@ -64,3 +64,17 @@ class DisableTest(TestCase):
         foo(0)
         self.assertFalse(TestWrapperFunction.called)
         
+class EnableTest(TestCase):
+    def test_with_args(self):
+        # set up
+        self.decorated = self.useFixture(DecoratedFixture())
+        @Conditional('a != 0')
+        def foo(a):
+            return a
+        self.decorated.disable(Conditional)
+        self.decorated.enable(Conditional)
+        
+        # test
+        self.assertIsNone(foo(0))
+        self.assertEqual(1, foo(1))
+        

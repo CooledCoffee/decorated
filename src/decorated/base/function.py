@@ -26,7 +26,7 @@ class Function(Proxy):
             self._decorate(args[0])
             
     def __call__(self, *args, **kw):
-        return self._decorate_or_call(*args, **kw)
+        return self._decorate_or_call(*args, **kw)  
     
     def __get__(self, obj, cls):
         if obj is None:
