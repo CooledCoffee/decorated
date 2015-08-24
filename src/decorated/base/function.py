@@ -114,15 +114,19 @@ class WrapperFunction(Function):
         try:
             result = super(WrapperFunction, self)._call(*args, **kw)
         except Exception as e:
-            self._after(None, e, *args, **kw)
+            self._error(e, *args, **kw)
             raise
-        self._after(result, None, *args, **kw)
+        else:
+            self._after(result, *args, **kw)
         return result
+    
+    def _after(self, ret, *args, **kw):
+        pass
     
     def _before(self, *args, **kw):
         pass
     
-    def _after(self, ret, error, *args, **kw):
+    def _error(self, error, *args, **kw):
         pass
     
 class ContextFunction(WrapperFunction):
@@ -131,7 +135,10 @@ class ContextFunction(WrapperFunction):
         return self
     
     def __exit__(self, error_type, error_value, traceback):
-        self._after(None, error_value)
+        if error_value is None:
+            self._after(None)
+        else:
+            self._error(error_value)
     
 def partial(func, init_args=(), init_kw=None, call_args=(), call_kw=None):
     if init_kw is None:

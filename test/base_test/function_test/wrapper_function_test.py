@@ -21,10 +21,9 @@ class AfterTest(TestCase):
     def test_success(self):
         # set up
         class TestFunction(WrapperFunction):
-            def _after(self, ret, error, *args, **kw):
+            def _after(self, ret, *args, **kw):
                 AfterTest.args = self._resolve_args(*args, **kw)
                 AfterTest.ret = ret
-                AfterTest.error = error
         @TestFunction
         def foo(a, b=0):
             return 1
@@ -34,15 +33,13 @@ class AfterTest(TestCase):
         self.assertEqual(1, result)
         self.assertEqual({'a': 1, 'b': 2}, self.args)
         self.assertEqual(1, self.ret)
-        self.assertEqual(None, self.error)
         
     def test_error(self):
         # set up
+        AfterTest.called = False
         class TestFunction(WrapperFunction):
             def _after(self, ret, error, *args, **kw):
-                AfterTest.args = self._resolve_args(*args, **kw)
-                AfterTest.ret = ret
-                AfterTest.error = error
+                AfterTest.called = True
         @TestFunction
         def foo(a, b=0):
             raise Exception()
@@ -50,36 +47,37 @@ class AfterTest(TestCase):
         # test
         with self.assertRaises(Exception):
             foo(1, b=2)
-        self.assertEqual({'a': 1, 'b': 2}, self.args)
-        self.assertIsNone(self.ret)
-        self.assertIsInstance(self.error, Exception)
+        self.assertFalse(self.called)
         
-    def test_success_but_error_in_after(self):
+class ErrorTest(TestCase):
+    def test_success(self):
         # set up
+        ErrorTest.called = False
         class TestFunction(WrapperFunction):
-            def _after(self, ret, error, *args, **kw):
-                AfterTest.ret = ret
-                raise Exception()
+            def _error(self, err, *args, **kw):
+                AfterTest.called = True
         @TestFunction
         def foo(a, b=0):
             return 1
         
         # test
-        with self.assertRaises(Exception):
-            foo(1, b=2)
-        self.assertEqual(1, self.ret)
+        result = foo(1, b=2)
+        self.assertEqual(1, result)
+        self.assertFalse(self.called)
         
-    def test_error_and_error_in_after(self):
+    def test_error(self):
         # set up
         class TestFunction(WrapperFunction):
-            def _after(self, ret, error, *args, **kw):
-                raise Exception('after error')
+            def _error(self, err, *args, **kw):
+                ErrorTest.err = err
+                ErrorTest.args = self._resolve_args(*args, **kw)
         @TestFunction
         def foo(a, b=0):
-            raise Exception('original error')
+            raise Exception()
         
         # test
-        with self.assertRaises(Exception) as ctx:
+        with self.assertRaises(Exception):
             foo(1, b=2)
-        self.assertEqual('after error', str(ctx.exception))
+        self.assertIsInstance(self.err, Exception)
+        self.assertEqual({'a': 1, 'b': 2}, self.args)
         

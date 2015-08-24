@@ -50,7 +50,7 @@ class Event(with_metaclass(EventMetaType, WrapperFunction)):
         for listener in cls._before_listeners:
             listener._call(**data)
             
-    def _after(self, ret, error, *args, **kw):
+    def _after(self, ret, *args, **kw):
         data = self._get_field_values(ret, *args, **kw)
         self._execute_after_listeners(data)
         

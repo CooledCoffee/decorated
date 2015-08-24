@@ -8,10 +8,9 @@ class CallTest(TestCase):
         class TestFunction(ContextFunction):
             def _before(self):
                 CallTest.before_called = True
-            def _after(self, ret, error):
+            def _after(self, ret):
                 CallTest.after_called = True
                 CallTest.ret = ret
-                CallTest.error = error
         @TestFunction
         def foo():
             return 1
@@ -22,16 +21,14 @@ class CallTest(TestCase):
         self.assertTrue(self.before_called)
         self.assertTrue(self.after_called)
         self.assertEqual(1, self.ret)
-        self.assertEqual(None, self.error)
         
     def test_error(self):
         # set up
         class TestFunction(ContextFunction):
             def _before(self):
                 CallTest.before_called = True
-            def _after(self, ret, error):
-                CallTest.after_called = True
-                CallTest.ret = ret
+            def _error(self, error):
+                CallTest.error_called = True
                 CallTest.error = error
         @TestFunction
         def foo():
@@ -41,8 +38,7 @@ class CallTest(TestCase):
         with self.assertRaises(Exception):
             foo()
         self.assertTrue(self.before_called)
-        self.assertTrue(self.after_called)
-        self.assertIsNone(self.ret)
+        self.assertTrue(self.error_called)
         self.assertIsInstance(self.error, Exception)
         
 class WithTest(TestCase):
@@ -51,24 +47,22 @@ class WithTest(TestCase):
         class TestFunction(ContextFunction):
             def _before(self, *args, **kw):
                 WithTest.before_called = True
-            def _after(self, ret, error, *args, **kw):
+            def _after(self, ret, *args, **kw):
                 WithTest.after_called = True
-                WithTest.error = error
         
         # test
         with TestFunction():
             pass
         self.assertTrue(self.before_called)
         self.assertTrue(self.after_called)
-        self.assertEqual(None, self.error)
         
     def test_error(self):
         # set up
         class TestFunction(ContextFunction):
             def _before(self, *args, **kw):
                 WithTest.before_called = True
-            def _after(self, ret, error, *args, **kw):
-                WithTest.after_called = True
+            def _error(self, error, *args, **kw):
+                WithTest.error_called = True
                 WithTest.error = error
         
         # test
@@ -76,7 +70,7 @@ class WithTest(TestCase):
             with TestFunction():
                 raise Exception()
         self.assertTrue(self.before_called)
-        self.assertTrue(self.after_called)
+        self.assertTrue(self.error_called)
         self.assertIsInstance(self.error, Exception)
         
     def test_init(self):
@@ -84,10 +78,6 @@ class WithTest(TestCase):
         class TestFunction(ContextFunction):
             def _init(self, a):
                 WithTest.a = a
-            def _before(self, *args, **kw):
-                pass
-            def _after(self, ret, error, *args, **kw):
-                pass
         
         # test
         with TestFunction(1):

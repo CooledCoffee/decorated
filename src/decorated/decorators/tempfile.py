@@ -4,17 +4,9 @@ import os
 import shutil
 
 class TempObject(ContextFunction):
-    def _after(self, ret, error, *args, **kw):
-        if error is None:
-            if not self._delete_on_success:
-                return
-        else:
-            if not self._delete_on_error:
-                return
-        path = self._calc_path(*args, **kw)
-        if not os.path.exists(path):
-            return
-        self.delete(path)
+    def _after(self, ret, *args, **kw):
+        if self._delete_on_success:
+            self._do_delete(*args, **kw)
         
     def _calc_path(self, *args, **kw):
         if self._func is None:
@@ -28,6 +20,16 @@ class TempObject(ContextFunction):
         self._path = self._compile_template(self._path)
         return self
     
+    def _do_delete(self, *args, **kw):
+        path = self._calc_path(*args, **kw)
+        if not os.path.exists(path):
+            return
+        self.delete(path)
+    
+    def _error(self, err, *args, **kw):
+        if self._delete_on_error:
+            self._do_delete(*args, **kw)
+        
     def _init(self, path, delete_on_success=True, delete_on_error=True):
         super(TempObject, self)._init()
         self._path = path
