@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from decorated.base import NOTSET
 from decorated.base.context import Context, ctx
 from decorated.base.function import Function, partial, WrapperFunction, \
     ContextFunction
@@ -14,6 +15,8 @@ from decorated.decorators.synchronized import Synchronized
 from decorated.decorators.tempfile import TempFile, TempDir
 from decorated.decorators.timeit import TimeIt
 from decorated.decorators.timeout import Timeout
+
+NOTSET = NOTSET
 
 Contxt = Context
 ctx = ctx

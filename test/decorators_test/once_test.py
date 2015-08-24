@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from decorated.base.context import Context
 from decorated.decorators.once import Once, OnceSession
-from fixtures._fixtures.monkeypatch import MonkeyPatch
 from fixtures2 import TestCase
 
 class DefaultSessionTest(TestCase):

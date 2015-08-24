@@ -1,131 +1,175 @@
 # -*- coding: utf-8 -*-
 from decorated.decorators.events import Event, EventError, event
-from fixtures.testcase import TestWithFixtures
+from fixtures2 import TestCase
 
 class FooEvent(Event):
     fields = ('a', 'b')
     ret_field = 'z'
     
-class EventTest(TestWithFixtures):
-    def setUp(self):
-        super(EventTest, self).setUp()
-        FooEvent._sources = []
-        FooEvent._after_listeners = []
-        
-class DecorateTest(EventTest):
-    def test(self):
-        @FooEvent
-        def foo1(a, b):
-            return 3
-        @FooEvent
-        def foo2(a, b):
-            return 3
-        @FooEvent.after
-        def after_foo1(a):
-            pass
-        @FooEvent.after
-        def after_foo2(z):
-            pass
-        self.assertEquals([foo1, foo2], FooEvent._sources)
-        self.assertEquals([after_foo1, after_foo2], FooEvent._after_listeners)
-        
-class EventValidateTest(EventTest):
-    def test_valid(self):
-        @FooEvent
-        def foo1(a, b):
-            pass
-        @FooEvent
-        def foo2(a, b, c):
+class ValidateTest(TestCase):
+    def test_basic_fields(self):
+        class TestEvent(Event):
+            fields = ('a', 'b')
+        @TestEvent
+        def foo(a, b, c):
             pass
         
-    def test_invalid(self):
-        with self.assertRaises(EventError):
-            @FooEvent
-            def foo1(c):
-                pass
-        with self.assertRaises(EventError):
-            @FooEvent
-            def foo2(a):
-                pass
-            
-    def test_empty_fields(self):
-        @Event
+    def test_complex_fields(self):
+        class TestEvent(Event):
+            fields = ('a', 'b', 'c')
+        @TestEvent(c='a + b')
         def foo(a, b):
             pass
-            
-class EventListenerValidateTest(EventTest):
-    def test_valid(self):
-        @FooEvent.after
-        def after_foo1(a):
-            pass
-        @FooEvent.after
-        def after_foo2(a, b):
-            pass
-        @FooEvent.after
-        def after_foo3(a, z):
-            pass
-        @FooEvent.after
-        def after_foo4(a, b, z):
-            pass
         
-    def test_invalid(self):
+    def test_failed(self):
+        class TestEvent(Event):
+            fields = ('a', 'b')
         with self.assertRaises(EventError):
-            @FooEvent.after
-            def after_foo1(c):
-                pass
-        with self.assertRaises(EventError):
-            @FooEvent.after
-            def after_foo2(a, b, z, c):
+            @TestEvent
+            def foo(a):
                 pass
     
-class CallTest(EventTest):
-    def test(self):
-        self.called = []
-        @FooEvent
+class ListenerValidateTest(TestCase):
+    def test_basic_fields(self):
+        class TestEvent(Event):
+            fields = ('a', 'b')
+        @TestEvent.before
+        def before(a):
+            pass
+        @TestEvent.after
+        def after(a):
+            pass
+        
+    def test_after_fields(self):
+        class TestEvent(Event):
+            fields = ('a', 'b')
+            after_fields = ('c',)
+        @TestEvent(c='ret')
         def foo(a, b):
             return a + b
-        @FooEvent.before
-        def before_foo(a):
-            self.called.append(a)
-        @FooEvent.after
-        def after_foo1(a):
-            self.called.append(a)
-        @FooEvent.after
-        def after_foo2(z):
-            self.called.append(z)
-        result = foo(1, 2)
-        self.assertEqual(3, result)
-        self.assertEquals([1, 1, 3], self.called)
+        @TestEvent.before
+        def before(a, b):
+            pass
+        @TestEvent.after
+        def after(c):
+            pass
         
-class FireTest(EventTest):
-    def test(self):
-        self.called = []
-        @FooEvent.before
-        def before_foo(a):
-            self.called.append(a)
-        @FooEvent.after
-        def after_foo1(a):
-            self.called.append(a)
-        @FooEvent.after
-        def after_foo2(z):
-            self.called.append(z)
-        FooEvent.fire({'a': 1, 'z': 3})
-        self.assertEquals([1, 1, 3], self.called)
-        
-class BuilderTest(EventTest):
-    def test(self):
-        self.called = []
-        foo_event = event(('a', 'b'), event_ret_field='z')
-        @foo_event
+    def test_failed(self):
+        class TestEvent(Event):
+            fields = ('a', 'b')
+        with self.assertRaises(EventError):
+            @TestEvent.before
+            def before(a, b, c):
+                pass
+        with self.assertRaises(EventError):
+            @TestEvent.after
+            def after(a, b, c):
+                pass
+            
+class CallTest(TestCase):
+    def test_basic(self):
+        # set up
+        calls = []
+        class TestEvent(Event):
+            fields = ('a', 'b')
+        @TestEvent
         def foo(a, b):
             return a + b
-        @foo_event.before
-        def before_foo(a):
-            self.called.append(a)
-        @foo_event.after
-        def after_foo1(a):
-            self.called.append(a)
+        @TestEvent.before
+        def before(a, b):
+            calls.append((a, b))
+        @TestEvent.after
+        def after(a, b):
+            calls.append((a, b))
+            
+        # test
         result = foo(1, 2)
         self.assertEqual(3, result)
-        self.assertEquals([1, 1], self.called)
+        self.assertEqual(2, len(calls))
+        self.assertEqual((1, 2), calls[0])
+        self.assertEqual((1, 2), calls[1])
+        
+    def test_complex_field(self):
+        # set up
+        calls = []
+        class TestEvent(Event):
+            fields = ('a', 'b', 'c')
+        @TestEvent(c='a + b')
+        def foo(a, b):
+            return a + b
+        @TestEvent.before
+        def before(c):
+            calls.append((c,))
+        @TestEvent.after
+        def after(c):
+            calls.append((c,))
+            
+        # test
+        foo(1, 2)
+        self.assertEqual(2, len(calls))
+        self.assertEqual((3,), calls[0])
+        self.assertEqual((3,), calls[1])
+        
+    def test_after_fields(self):
+        # set up
+        calls = []
+        class TestEvent(Event):
+            fields = ('a', 'b')
+            after_fields = ('c',)
+        @TestEvent(c='ret')
+        def foo(a, b):
+            return a + b
+        @TestEvent.before
+        def before(a, b):
+            calls.append((a, b))
+        @TestEvent.after
+        def after(c):
+            calls.append((c,))
+            
+        # test
+        foo(1, 2)
+        self.assertEqual(2, len(calls))
+        self.assertEqual((1, 2), calls[0])
+        self.assertEqual((3,), calls[1])
+    
+class FireTest(TestCase):
+    def test(self):
+        # set up
+        calls = []
+        class TestEvent(Event):
+            fields = ('a', 'b')
+        @TestEvent.before
+        def before(a, b):
+            calls.append((a, b))
+        @TestEvent.after
+        def after(a, b):
+            calls.append((a, b))
+            
+        # test
+        TestEvent.fire({'a': 1, 'b': 2})
+        self.assertEqual(2, len(calls))
+        self.assertEqual((1, 2), calls[0])
+        self.assertEqual((1, 2), calls[1])
+        
+class BuilderTest(TestCase):
+    def test(self):
+        # set up
+        calls = []
+        test_event = event(('a', 'b'))
+        @test_event
+        def foo(a, b):
+            return a + b
+        @test_event.before
+        def before(a, b):
+            calls.append((a, b))
+        @test_event.after
+        def after(a, b):
+            calls.append((a, b))
+            
+        # test
+        result = foo(1, 2)
+        self.assertEqual(3, result)
+        self.assertEqual(2, len(calls))
+        self.assertEqual((1, 2), calls[0])
+        self.assertEqual((1, 2), calls[1])
         
