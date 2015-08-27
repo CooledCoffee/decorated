@@ -4,7 +4,7 @@ import setuptools
 
 setup(
     name='decorated',
-    version='1.6.2',
+    version='1.6.3',
     author='Mengchen LEE',
     author_email='CooledCoffee@gmail.com',
     classifiers = [
@@ -23,5 +23,5 @@ setup(
     ],
     package_dir={'': 'src'},
     packages=setuptools.find_packages(where='src'),
-    url='https://github.com/CooledCoffee/decorated/',
+    url='https://package-insights.appspot.com/packages/decorated',
 )
