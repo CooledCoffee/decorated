@@ -41,3 +41,16 @@ class TempFile(TempObject):
             
 class TempDir(TempObject):
     delete = shutil.rmtree
+
+class WritingFile(ContextFunction):
+    def _init(self, path):
+        super(WritingFile, self)._init()
+        self.path = path
+        self.writing_path = self.path + '.writing'
+        
+    def _after(self, ret, *args, **kw):
+        shutil.move(self.writing_path, self.path)
+    
+    def _error(self, err, *args, **kw):
+        os.remove(self.writing_path)
+    

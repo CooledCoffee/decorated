@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
-from decorated.decorators.tempfile import TempFile
-from fixtures._fixtures.tempdir import TempDir as TempDirFixture
-from fixtures2 import TestCase
+from decorated.decorators.files import TempFile, WritingFile
+from testutil import TestCase
 import os
 
 class TempFileTest(TestCase):
     def setUp(self):
         super(TempFileTest, self).setUp()
-        self.tempdir = self.useFixture(TempDirFixture())
         self.path = self.tempdir.join('111')
         
     def test_never_created(self):
@@ -48,6 +46,25 @@ class TempFileTest(TestCase):
             _touch(path)
         create_file(self.path)
         self.assertFalse(os.path.exists(self.path))
+        
+class WritingFileTest(TestCase):
+    def test_success(self):
+        path = self.tempdir.join('111')
+        with WritingFile(path) as wf:
+            with open(wf.writing_path, 'w') as f:
+                f.write('aaa')
+        self.assertFalse(os.path.exists(wf.writing_path))
+        self.assertEqual('aaa', open(path).read())
+        
+    def test_error(self):
+        path = self.tempdir.join('111')
+        with self.assertRaises(Exception):
+            with WritingFile(path) as wf:
+                with open(wf.writing_path, 'w') as f:
+                    f.write('aaa')
+                raise Exception()
+        self.assertFalse(os.path.exists(wf.writing_path))
+        self.assertFalse(os.path.exists(path))
         
 def _touch(path):
     f = open(path, 'w')

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from decorated.decorators.conditional import Conditional
-from fixtures._fixtures.monkeypatch import MonkeyPatch
 from fixtures2 import TestCase
 
 class FunctionTest(TestCase):

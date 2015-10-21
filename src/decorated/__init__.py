@@ -6,13 +6,13 @@ from decorated.base.function import Function, partial, WrapperFunction, \
 from decorated.decorators import events
 from decorated.decorators.conditional import Conditional
 from decorated.decorators.events import Event
+from decorated.decorators.files import TempFile, TempDir, WritingFile
 from decorated.decorators.instantiate import Instantiate
 from decorated.decorators.once import Once, OnceSession
 from decorated.decorators.profile import Profile
 from decorated.decorators.remove_extra_args import RemoveExtraArgs
 from decorated.decorators.retries import Retries
 from decorated.decorators.synchronized import Synchronized
-from decorated.decorators.tempfile import TempFile, TempDir
 from decorated.decorators.timeit import TimeIt
 from decorated.decorators.timeout import Timeout
 
@@ -40,3 +40,4 @@ tempfile = TempFile
 tempdir = TempDir
 timeit = TimeIt
 timeout = Timeout
+writing_file = WritingFile
