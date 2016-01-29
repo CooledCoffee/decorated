@@ -17,6 +17,9 @@ setup(
         'Topic :: Software Development :: Libraries',
     ],
     description='Decorator framework and common decorators for python.',
+    extras_require={
+        'test': ['pylru'],
+    },
     install_requires=[
         'fixtures2>=0.1.2',
         'six',

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from decorated.base.function import Function
-from decorated.util import templates
+from decorated.util import templates, modutil
 
 class CacheDecorator(Function):
     @property
@@ -73,20 +73,22 @@ class SimpleCache(Cache):
     def _set(self, key, value):
         self._data[key] = value
         
-class LruCache(Cache):
-    def __init__(self, size=1000):
-        from pylru import lrucache
-        self._cache = lrucache(size)
-        
-    def _delete(self, key):
-        del self._cache[key]
+if modutil.module_exists('pylru'):
+    from pylru import lrucache
     
-    def _get(self, key):
-        try:
-            return self._cache[key]
-        except KeyError:
-            return None
-    
-    def _set(self, key, value):
-        self._cache[key] = value
+    class LruCache(Cache):
+        def __init__(self, size=1000):
+            self._cache = lrucache(size)
+            
+        def _delete(self, key):
+            del self._cache[key]
         
+        def _get(self, key):
+            try:
+                return self._cache[key]
+            except KeyError:
+                return None
+        
+        def _set(self, key, value):
+            self._cache[key] = value
+            
