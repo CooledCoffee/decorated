@@ -5,20 +5,20 @@ from unittest.case import TestCase
 class WithTest(TestCase):
     def test_single_level(self):
         with Context(path='/test'):
-            self.assertEqual('/test', Context._current.get().path)
+            self.assertEqual('/test', Context.current().path)
             
     def test_multi_levels(self):
-        with Context(a=1, b=2) as ctx1:
-            self.assertEqual(1, ctx1.a)
-            self.assertEqual(2, ctx1.b)
-            with Context(b=3, c=4) as ctx2:
-                self.assertEqual(1, ctx2.a)
-                self.assertEqual(3, ctx2.b)
-                self.assertEqual(4, ctx2.c)
-            self.assertEqual(1, ctx1.a)
-            self.assertEqual(2, ctx1.b)
+        with Context(a=1, b=2):
+            self.assertEqual(1, Context.current().a)
+            self.assertEqual(2, Context.current().b)
+            with Context(b=3, c=4):
+                self.assertEqual(1, Context.current().a)
+                self.assertEqual(3, Context.current().b)
+                self.assertEqual(4, Context.current().c)
+            self.assertEqual(1, Context.current().a)
+            self.assertEqual(2, Context.current().b)
             with self.assertRaises(AttributeError):
-                ctx1.c
+                Context.current().c
             
     def test_multi_levels_method(self):
         class Context1(Context):
@@ -33,17 +33,17 @@ class WithTest(TestCase):
              
             def c(self):
                 return 4
-        with Context1() as ctx1:
-            self.assertEqual(1, ctx1.a())
-            self.assertEqual(2, ctx1.b())
-            with Context2() as ctx2:
-                self.assertEqual(1, ctx2.a())
-                self.assertEqual(3, ctx2.b())
-                self.assertEqual(4, ctx2.c())
-            self.assertEqual(1, ctx1.a())
-            self.assertEqual(2, ctx1.b())
+        with Context1():
+            self.assertEqual(1, Context.current().a())
+            self.assertEqual(2, Context.current().b())
+            with Context2():
+                self.assertEqual(1, Context.current().a())
+                self.assertEqual(3, Context.current().b())
+                self.assertEqual(4, Context.current().c())
+            self.assertEqual(1, Context.current().a())
+            self.assertEqual(2, Context.current().b())
             with self.assertRaises(AttributeError):
-                self.assertEqual(3, ctx1.c())
+                self.assertEqual(3, Context.current().c())
         
 class DictTest(TestCase):
     def test_single_level(self):
