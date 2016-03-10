@@ -43,13 +43,20 @@ class TempDir(TempObject):
     delete = shutil.rmtree
 
 class WritingFile(ContextFunction):
+    def discard(self):
+        self._discarded = True
+        
     def _init(self, path):
         super(WritingFile, self)._init()
         self.path = path
         self.writing_path = self.path + '.writing'
+        self._discarded = False
         
     def _after(self, ret, *args, **kw):
-        shutil.move(self.writing_path, self.path)
+        if self._discarded:
+            os.remove(self.writing_path)
+        else:
+            shutil.move(self.writing_path, self.path)
     
     def _error(self, err, *args, **kw):
         os.remove(self.writing_path)

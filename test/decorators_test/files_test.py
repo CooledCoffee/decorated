@@ -66,6 +66,15 @@ class WritingFileTest(TestCase):
         self.assertFalse(os.path.exists(wf.writing_path))
         self.assertFalse(os.path.exists(path))
         
+    def test_discard(self):
+        path = self.tempdir.join('111')
+        with WritingFile(path) as wf:
+            with open(wf.writing_path, 'w') as f:
+                f.write('aaa')
+            wf.discard()
+        self.assertFalse(os.path.exists(wf.writing_path))
+        self.assertFalse(os.path.exists(path))
+        
 def _touch(path):
     f = open(path, 'w')
     f.close()
