@@ -10,13 +10,14 @@ class Retries(Function):
         self._delay = delay
         
     def _call(self, *args, **kw):
-        for i in range(self._times + 1):
+        times = 0
+        while True:
             try:
                 return super(Retries, self)._call(*args, **kw)
-            except Exception as e:
-                last_error = e
-                if i < self._times - 1:
+            except Exception:
+                times += 1
+                if times <= self._times:
                     time.sleep(self._delay)
-        else:
-            raise
+                else:
+                    raise
         
