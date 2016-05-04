@@ -42,3 +42,13 @@ class RetriesTest(TestCase):
             def bar():
                 pass
         
+    def test_error_types(self):
+        @Retries(3, error_types=(IOError, TypeError))
+        def foo():
+            foo.times += 1
+            raise Exception()
+        foo.times = 0
+        with self.assertRaises(Exception):
+            foo()
+        self.assertEqual(1, foo.times)
+        
