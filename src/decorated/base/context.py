@@ -48,7 +48,7 @@ class Context(with_metaclass(ContextMeta, Dict)):
         for defer in self._defers:
             try:
                 defer()
-            except:
+            except Exception:
                 log.warn('Failed to execute defer "%s".' % defer)
                 pass
         Context._current.set(self._parent)
