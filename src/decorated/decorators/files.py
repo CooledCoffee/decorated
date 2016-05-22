@@ -24,7 +24,7 @@ class TempObject(ContextFunction):
         path = self._calc_path(*args, **kw)
         if not os.path.exists(path):
             return
-        self.delete(path)
+        self._delete(path)
     
     def _error(self, err, *args, **kw):
         if self._delete_on_error:
@@ -37,10 +37,12 @@ class TempObject(ContextFunction):
         self._delete_on_error = delete_on_error
         
 class TempFile(TempObject):
-    delete = os.remove
+    def _delete(self, path):
+        os.remove(path)
             
 class TempDir(TempObject):
-    delete = shutil.rmtree
+    def _delete(self, path):
+        shutil.rmtree(path)
 
 class WritingFile(ContextFunction):
     def discard(self):
