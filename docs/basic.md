@@ -35,12 +35,12 @@ the execution is proxied to the \_call method with the actual arguments.
 	        return result
 	
 	@cache
-	def get_config_from_db():
+	def load_config_from_db():
 	    print('loading config from db ...')
 	    return 'config'
 	
-	print(get_config_from_db()) # will load from db
-	print(get_config_from_db()) # will load from cache
+	print(load_config_from_db()) # will load from db
+	print(load_config_from_db()) # will load from cache
 
 ## Example 2: Decorator with arguments
 
@@ -52,24 +52,27 @@ the execution is proxied to the \_call method with the actual arguments.
 	    def _init(self, key=None):
 	        self._key = key
 	
-	    def _decorate(self, func):
-	        self._key = func.__name__
-	        return super(cache, self)._decorate(func)
-	
 	    def _call(self, *args, **kw):
 	        result = self._items.get(self._key)
 	        if result is None:
 	            result = super(cache, self)._call(*args, **kw)
 	            self._items[self._key] = result
 	        return result
-	    
+	
 	@cache('config')
-	def get_config_from_db():
+	def load_config_from_db():
 	    print('loading config from db ...')
 	    return 'config'
 	
-	print(get_config_from_db()) # will load from db
-	print(get_config_from_db()) # will load from cache
+	@cache('data')
+	def load_data_from_db():
+	    print('loading data from db ...')
+	    return 'data'
+	
+	print(load_config_from_db()) # will load from db
+	print(load_config_from_db()) # will load from cache
+	print(load_data_from_db()) # will load from db
+	print(load_data_from_db()) # will load from cache
 
 ## Example 3: Decorator that can be used with or without arguments
 
@@ -82,7 +85,8 @@ the execution is proxied to the \_call method with the actual arguments.
 	        self._key = key
 	        
 	    def _decorate(self, func):
-	        self._key = func.__name__
+	        if self._key is None:
+	            self._key = func.__name__
 	        return super(cache, self)._decorate(func)
 	        
 	    def _call(self, *args, **kw):
@@ -93,16 +97,16 @@ the execution is proxied to the \_call method with the actual arguments.
 	        return result
 	
 	@cache
-	def get_config1_from_db():
+	def load_config1_from_db():
 	    print('loading config1 from db ...')
 	    return 'config1'
 	
 	@cache('config2')
-	def get_config2_from_db():
+	def load_config2_from_db():
 	    print('loading config2 from db ...')
 	    return 'config2'
 	
-	print(get_config1_from_db()) # will load from db
-	print(get_config1_from_db()) # will load from cache
-	print(get_config2_from_db()) # will load from db
-	print(get_config2_from_db()) # will load from cache
+	print(load_config1_from_db()) # will load from db
+	print(load_config1_from_db()) # will load from cache
+	print(load_config2_from_db()) # will load from db
+	print(load_config2_from_db()) # will load from cache
