@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from decorated.decorators.files import TempFile, WritingFile
+from decorated.decorators.files import TempFile, WritingFile, TempDir
 from testutil import TestCase
 import os
 
@@ -46,6 +46,13 @@ class TempFileTest(TestCase):
             _touch(path)
         create_file(self.path)
         self.assertFalse(os.path.exists(self.path))
+        
+class TempDirTest(TestCase):
+    def test(self):
+        dirname = self.tempdir.join('111')
+        with TempDir(dirname):
+            os.mkdir(dirname)
+        self.assertFalse(os.path.exists(dirname))
         
 class WritingFileTest(TestCase):
     def test_success(self):
