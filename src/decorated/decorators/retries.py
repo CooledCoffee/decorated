@@ -21,7 +21,7 @@ class Retries(Function):
             except Exception as e:
                 times += 1
                 if times <= self._times and isinstance(e, self._error_types):
-                    log.warn('Execution failed. Will retry in %f seconds.' % self._delay)
+                    log.warn('Execution failed. Will retry in %f seconds.' % self._delay, exc_info=True)
                     time.sleep(self._delay)
                 else:
                     log.warn('Execution failed permanently.')
