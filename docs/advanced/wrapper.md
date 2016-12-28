@@ -12,7 +12,7 @@ For example,
 	    def _before(self, *args, **kw):
 	        print('before foo')
 	    
-	    def _after(self, ret, error, *args, **kw):
+	    def _after(self, ret, *args, **kw):
 	        print('after foo')
 	
 	@log
