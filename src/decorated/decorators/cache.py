@@ -2,7 +2,7 @@
 import time
 
 from decorated.base.function import Function
-from decorated.util import templates, modutil
+from decorated.util import modutil, templates
 
 class CacheDecorator(Function):
     @property
@@ -45,6 +45,9 @@ class Cache(object):
                     self._cache._set(key, result, options)
                 return result
         return _Decorator(self, key, vars=vars, options=options)
+
+    def clear(self):
+        raise NotImplementedError()
     
     def uncache(self, key, vars=None, **options):
         class _Decorator(CacheDecorator):
@@ -65,6 +68,10 @@ class Cache(object):
 
 class SimpleCache(Cache):
     def __init__(self):
+        super(SimpleCache, self).__init__()
+        self.clear()
+
+    def clear(self):
         self._data = {}
         
     def _delete(self, key, options):
@@ -86,7 +93,11 @@ if modutil.module_exists('pylru'):
     
     class LruCache(Cache):
         def __init__(self, size=1000):
-            self._cache = lrucache(size)
+            self._size = size
+            self.clear()
+
+        def clear(self):
+            self._cache = lrucache(self._size)
             
         def _delete(self, key, options):
             del self._cache[key]

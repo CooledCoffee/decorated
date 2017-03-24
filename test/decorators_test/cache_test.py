@@ -4,7 +4,7 @@ from decorated.decorators.cache import SimpleCache, LruCache
 from unittest.case import TestCase
 
 class SimpleCacheTest(TestCase):
-    def test(self):
+    def test_get_set(self):
         cache = SimpleCache()
         self.assertIsNone(cache._get('a', {}))
         cache._set('a', 1, {})
@@ -12,13 +12,25 @@ class SimpleCacheTest(TestCase):
         cache._delete('a', {})
         self.assertIsNone(cache._get('a', {}))
 
+    def test_clear(self):
+        cache = SimpleCache()
+        cache._set('a', 1, {})
+        cache.clear()
+        self.assertIsNone(cache._get('a', {}))
+
 class LruCacheTest(TestCase):
-    def test(self):
+    def test_get_set(self):
         cache = LruCache()
         self.assertIsNone(cache._get('a', {}))
         cache._set('a', 1, {})
         self.assertEquals(1, cache._get('a', {}))
         cache._delete('a', {})
+        self.assertIsNone(cache._get('a', {}))
+
+    def test_clear(self):
+        cache = LruCache()
+        cache._set('a', 1, {})
+        cache.clear()
         self.assertIsNone(cache._get('a', {}))
         
 class CacheTest(TestCase):
