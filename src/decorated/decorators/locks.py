@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
+import fcntl
 import os
 from threading import RLock
 
-import fcntl
-
-from decorated import WrapperFunction
+from decorated import ContextFunction, WrapperFunction
 
 
-class Lock(WrapperFunction):
+class Lock(ContextFunction):
     def lock(self):
         raise NotImplementedError()
 
