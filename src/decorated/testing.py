@@ -10,7 +10,7 @@ class DecoratedFixture(PatchesFixture):
             else:
                 return self._func(*args, **kw)
         self.patch_object(cls, '_old__call__', cls.__call__)
-        self.patch_object(cls, '__call__', Function._call)
+        self.patch_object(cls, '__call__', Function._call) # pylint: disable=protected-access
     
-    def enable(self, cls):
-        cls.__call__ = cls._old__call__
+    def enable(self, cls): # pylint: disable=no-self-use
+        cls.__call__ = cls._old__call__ # pylint: disable=protected-access

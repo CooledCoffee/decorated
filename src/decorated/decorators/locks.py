@@ -26,9 +26,10 @@ class Lock(ContextFunction):
         self.unlock()
 
 class FileLock(Lock):
-    def _init(self, path):
+    def _init(self, path): # pylint: disable=arguments-differ
         super(FileLock, self)._init()
         self._path = path
+        self._fd = None
 
     def lock(self):
         _create_file_if_not_exist(self._path)
@@ -59,7 +60,7 @@ class _LockProxy(WrapperFunction):
     def _error(self, error, *args, **kw):
         self._target.unlock()
 
-    def _init(self, target):
+    def _init(self, target): # pylint: disable=arguments-differ
         super(_LockProxy, self)._init()
         self._target = target
 

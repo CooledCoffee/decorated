@@ -11,18 +11,22 @@ class Template(object):
         
     def eval(self, values):
         parts = []
-        for p in self._parts:
+        for part in self._parts:
             try:
-                part = p.eval(values)
+                part = part.eval(values)
                 part = str(part)
                 parts.append(part)
             except Exception:
-                raise TemplateError('Failed to evaluate expression "%s" in template "%s".' % (p._expression, self._expression))
+                raise TemplateError('Failed to evaluate expression "%s" in template "%s".'
+                        % (part.expression, self._expression))
         return ''.join(parts)
 
 class Part(object):
     def __init__(self, expression):
-        self._expression = expression
+        self.expression = expression
+
+    def eval(self, variables):
+        raise NotImplementedError()
         
 class StringPart(Part):
     '''
@@ -30,7 +34,7 @@ class StringPart(Part):
     'abc'
     '''
     def eval(self, variables):
-        return self._expression
+        return self.expression
     
 class VariablePart(Part):
     '''
@@ -45,24 +49,24 @@ class VariablePart(Part):
     1
     '''
     def eval(self, variables):
-        return eval(self._expression, variables)
+        return eval(self.expression, variables) # pylint: disable=eval-used
 
 def compile(template, names):
     parts = []
     expression = ''
-    for c in template:
-        if c == '{':
+    for char in template:
+        if char == '{':
             if expression:
                 parts.append(StringPart(expression))
                 expression = ''
-        elif c == '}':
+        elif char == '}':
             variable = expression.split('.', 1)[0].split('[', 1)[0]
             if not variable in names:
                 raise TemplateError('Unknown variable "%s" in template "%s".' % (expression, template))
             parts.append(VariablePart(expression))
             expression = ''
         else:
-            expression += c
+            expression += char
     if expression:
         parts.append(StringPart(expression))
     return Template(template, parts)

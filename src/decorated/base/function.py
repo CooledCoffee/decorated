@@ -12,8 +12,9 @@ class ArgError(Exception):
         super(ArgError, self).__init__(message)
         self.param = param
 
-class Function(Proxy):
+class Function(Proxy): # pylint: disable=too-many-instance-attributes
     def __init__(self, *args, **kw):
+        super(Function, self).__init__()
         self.params = None
         self.required_params = None
         self.optional_params = None
@@ -33,9 +34,9 @@ class Function(Proxy):
             method = Function(self)
         else:
             method = partial(Function, call_args=(obj,))(self)
-        method.im_class = cls
-        method.im_func = method.__func__ = self
-        method.im_self = method.__self__ = obj
+        method.im_class = cls # pylint: disable=attribute-defined-outside-init
+        method.im_func = method.__func__ = self # pylint: disable=attribute-defined-outside-init
+        method.im_self = method.__self__ = obj # pylint: disable=attribute-defined-outside-init
         return method
     
     def __str__(self):
@@ -70,13 +71,13 @@ class Function(Proxy):
         return self
     
     def _evaluate_expression(self, expression, *args, **kw):
-        d = self._resolve_args(*args, **kw)
-        return eval(expression, d)
+        arg_dict = self._resolve_args(*args, **kw)
+        return eval(expression, arg_dict) # pylint: disable=eval-used
         
     def _init(self, *args, **kw):
         pass
     
-    def _is_init_args(self, *args, **kw):
+    def _is_init_args(self, *args, **kw): # pylint: disable=no-self-use
         return len(args) != 1 or not callable(args[0]) or len(kw) != 0
         
     def _parse_params(self, func):
@@ -97,16 +98,16 @@ class Function(Proxy):
         self.optional_params = tuple(self.optional_params)
         
     def _resolve_args(self, *args, **kw):
-        d = {name: default for name, default in self.optional_params}
+        results = {name: default for name, default in self.optional_params}
         for param, arg in zip(self.params, args):
-            d[param] = arg
-        d.update(kw)
+            results[param] = arg
+        results.update(kw)
         for name in self.params:
-            if name not in d:
+            if name not in results:
                 msg = 'Missing argument "%s" for %s.' % (name, str(self))
                 raise ArgError(name, msg)
-        d = {k: v for k, v in d.items() if k in self.params}
-        return d
+        results = {k: v for k, v in results.items() if k in self.params}
+        return results
     
 class WrapperFunction(Function):
     def _call(self, *args, **kw):
@@ -145,7 +146,7 @@ def partial(func, init_args=(), init_kw=None, call_args=(), call_kw=None):
         init_kw = {}
     if call_kw is None:
         call_kw = {}
-    class _PartialFunction(func):
+    class _PartialFunction(func): # pylint: disable=too-many-instance-attributes
         def __getattr__(self, name):
             attr = getattr(self._func, name)
             if callable(attr):
@@ -174,11 +175,11 @@ def partial(func, init_args=(), init_kw=None, call_args=(), call_kw=None):
             
         def _parse_params(self, func):
             super(_PartialFunction, self)._parse_params(func)
-            self.params = self.params[len(call_args):]
-            self.required_params = self.params[len(call_args):]
-            self.params = tuple([p for p in self.params if p not in call_kw])
-            self.required_params = tuple([p for p in self.required_params if p not in call_kw])
-            self.optional_params = tuple([(k, v) for (k, v) in self.optional_params if k not in call_kw])
+            self.params = self.params[len(call_args):] # pylint: disable=attribute-defined-outside-init
+            self.required_params = self.params[len(call_args):] # pylint: disable=attribute-defined-outside-init
+            self.params = tuple([p for p in self.params if p not in call_kw]) # pylint: disable=attribute-defined-outside-init
+            self.required_params = tuple([p for p in self.required_params if p not in call_kw]) # pylint: disable=attribute-defined-outside-init
+            self.optional_params = tuple([(k, v) for (k, v) in self.optional_params if k not in call_kw]) # pylint: disable=attribute-defined-outside-init
     return _PartialFunction
         
 def _is_bound_method(func):

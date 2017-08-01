@@ -1,39 +1,42 @@
 # -*- coding: utf-8 -*-
+import doctest
+import logging
+
+import six
+
 from decorated.base.dict import Dict
 from decorated.base.proxy import Proxy
 from decorated.base.thread_local import ThreadLocal
-from six import with_metaclass
-import doctest
-import logging
 
 log = logging.getLogger(__name__)
 
 class ContextMeta(type):
-    def __new__(self, name, bases, attrs):
-        cls = type.__new__(self, name, bases, attrs)
+    def __new__(mcs, name, bases, attrs):
+        cls = type.__new__(mcs, name, bases, attrs)
         sub_class_enter = getattr(cls, '__enter__', None)
         def _enter(instance):
             result = instance
             if sub_class_enter is not None:
                 result = sub_class_enter(instance)
-            cls._current.set(instance)
+            cls._current.set(instance) # pylint: disable=protected-access
             return result
         cls.__enter__ = _enter
         sub_class_exit = getattr(cls, '__exit__', None)
         def _exit(instance, *args, **kw):
-            cls._current.set(None)
+            cls._current.set(None) # pylint: disable=protected-access
             if sub_class_exit is not None:
                 sub_class_exit(instance, *args, **kw)
         cls.__exit__ = _exit
-        cls._current = ThreadLocal()
+        cls._current = ThreadLocal() # pylint: disable=protected-access
         return cls
         
-    def current(self):
-        return self._current.get()
+    def current(cls):
+        return cls._current.get()
     
-class Context(with_metaclass(ContextMeta, Dict)):
+class Context(six.with_metaclass(ContextMeta, Dict)):
     def __init__(self, **kw):
         super(Context, self).__init__(**kw)
+        self._defers = None
         self._parent = None
         
     def __contains__(self, name):
@@ -49,8 +52,7 @@ class Context(with_metaclass(ContextMeta, Dict)):
             try:
                 defer()
             except Exception:
-                log.warn('Failed to execute defer "%s".' % defer)
-                pass
+                log.warn('Failed to execute defer "%s".', defer)
         Context._current.set(self._parent)
         
     def __getattr__(self, name):
@@ -92,9 +94,9 @@ class ContextProxy(Proxy):
     
     @property
     def target(self):
-        ctx = Context._current.get()
-        if ctx:
-            return ctx
+        context = Context._current.get() # pylint: disable=protected-access
+        if context:
+            return context
         else:
             raise ContextError('Context should be set first.')
     

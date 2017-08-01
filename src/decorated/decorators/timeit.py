@@ -28,14 +28,14 @@ class TimeIt(Function):
         self._reporter(timing)
         return result
     
-    def _init(self, iterations=1, repeats=1, reporter=reporters.PRINT_REPORTER):
+    def _init(self, iterations=1, repeats=1, reporter=reporters.PRINT_REPORTER): # pylint: disable=arguments-differ
         super(TimeIt, self)._init()
         self._iterations = iterations
         self._repeats = repeats
         self._reporter = reporter
         
 class Result(object):
-    def __init__(self, func, args, kwargs, iterations, repeats, timings):
+    def __init__(self, func, args, kwargs, iterations, repeats, timings): # pylint: disable=too-many-arguments
         self.func = func
         self.args = args
         self.kwargs = kwargs

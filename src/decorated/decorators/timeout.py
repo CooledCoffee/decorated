@@ -12,7 +12,7 @@ class Timeout(ContextFunction):
             return
         
         self._old_handler = signal.getsignal(signal.SIGALRM)
-        def _timeout(*args):
+        def _timeout(*args): # pylint: disable=unused-argument
             raise TimeoutError()
         signal.signal(signal.SIGALRM, _timeout)
         old_alarm = signal.alarm(self._seconds)
@@ -22,7 +22,7 @@ class Timeout(ContextFunction):
     def _error(self, error, *args, **kw):
         self._restore()
     
-    def _init(self, seconds):
+    def _init(self, seconds): # pylint: disable=arguments-differ
         self._seconds = seconds
         self._old_handler = None
         self._old_alarm_time = None

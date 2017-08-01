@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name
 from decorated.base import NOTSET
 from decorated.base.context import Context, ctx
-from decorated.base.function import Function, partial, WrapperFunction, \
-    ContextFunction
+from decorated.base.function import ContextFunction, Function, WrapperFunction, partial
 from decorated.decorators import events
 from decorated.decorators.conditional import Conditional
 from decorated.decorators.events import Event
-from decorated.decorators.files import TempFile, TempDir, WritingFile
-from decorated.decorators.instantiate import Instantiate
+from decorated.decorators.files import TempDir, TempFile, WritingFile
 from decorated.decorators.once import Once, OnceSession
 from decorated.decorators.profile import Profile
 from decorated.decorators.remove_extra_args import RemoveExtraArgs
@@ -28,7 +27,6 @@ partial = partial
 conditional = Conditional
 event = events.event
 Event = Event
-instantiate = Instantiate
 once = Once
 OnceSession = OnceSession
 profile = Profile

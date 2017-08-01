@@ -1,31 +1,35 @@
 # -*- coding: utf-8 -*-
-from decorated.base.context import Context, ctx, ContextError
+import six
+
+from decorated.base import NOTSET
+from decorated.base.context import ContextError, ContextMeta
 from decorated.base.function import Function
 
 class Once(Function):
     def _call(self, *args, **kw):
         key = self._evaluate_expression(self._key, *args, **kw)
         key = (self._func, key)
+
         try:
-            results = ctx._once
+            values = OnceSession.current().values
         except ContextError:
-            results = _DEFAULT_SESSION._once
+            values = _DEFAULT_SESSION.values
         except AttributeError:
-            results = _DEFAULT_SESSION._once
-        if key in results:
-            result = results[key]
-        else:
-            result = super(Once, self)._call(*args, **kw)
-            results[key] = result
-        return result
+            values = _DEFAULT_SESSION.values
+
+        value = values.get(key, NOTSET)
+        if value == NOTSET:
+            value = super(Once, self)._call(*args, **kw)
+            values[key] = value
+        return value
     
-    def _init(self, key='None'):
+    def _init(self, key='None'): # pylint: disable=arguments-differ
         super(Once, self)._init()
         self._key = key
         
-class OnceSession(Context):
+class OnceSession(six.with_metaclass(ContextMeta, object)):
     def __init__(self):
         super(OnceSession, self).__init__()
-        self._once = {}
+        self.values = {}
         
 _DEFAULT_SESSION = OnceSession()
