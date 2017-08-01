@@ -26,5 +26,5 @@ setup(
     ],
     package_dir={'': 'src'},
     packages=setuptools.find_packages(where='src'),
-    url='https://package-insights.appspot.com/packages/decorated',
+    url='https://github.com/cooledcoffee/decorated',
 )
