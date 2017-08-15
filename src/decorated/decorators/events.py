@@ -3,7 +3,7 @@ import doctest
 
 from six import with_metaclass
 
-from decorated.base import NOTSET
+from decorated.base.false import NOTSET
 from decorated.base.function import WrapperFunction
 from decorated.decorators.once import Once
 from decorated.decorators.remove_extra_args import RemoveExtraArgs

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import six
 
-from decorated.base import NOTSET
 from decorated.base.context import ContextError, ContextMeta
+from decorated.base.false import NOTSET
 from decorated.base.function import Function
 
 class Once(Function):
