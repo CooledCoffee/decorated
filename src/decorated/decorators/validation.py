@@ -17,6 +17,7 @@ class ValidationEngine(object):
     def rules(self, validators, error_class=None):
         error_class = error_class or self._default_error_class
         return Rules(validators, error_class)
+engine = ValidationEngine()
 
 class Rules(WrapperFunction):
     def _before(self, *args, **kw):
