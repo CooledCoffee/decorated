@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from collections import Iterable
 
+import six
+
 
 def listify(value_or_values):
     '''
@@ -13,7 +15,7 @@ def listify(value_or_values):
     '''
     if isinstance(value_or_values, list):
         return value_or_values
-    elif isinstance(value_or_values, basestring):
+    elif isinstance(value_or_values, six.string_types):
         return [value_or_values]
     elif isinstance(value_or_values, Iterable):
         return list(value_or_values)

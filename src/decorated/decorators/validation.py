@@ -3,6 +3,8 @@ from collections import Iterable
 
 import re
 
+import six
+
 from decorated.base.function import WrapperFunction
 from decorated.util import dutil
 
@@ -113,13 +115,13 @@ class OfTypeValidator(Validator):
 
     def _validate(self, value):
         '''
-        >>> OfTypeValidator('id', basestring)._validate('111')
+        >>> OfTypeValidator('value', int)._validate(111)
 
-        >>> OfTypeValidator('id', basestring)._validate(111)
-        'Arg id should be basestring, got "111" (type=int).'
+        >>> OfTypeValidator('value', int)._validate('111')
+        'Arg value should be int, got "111" (type=str).'
 
-        >>> OfTypeValidator('id', (str, unicode))._validate(111)
-        'Arg id should be (str, unicode), got "111" (type=int).'
+        >>> OfTypeValidator('value', (int, float))._validate('111')
+        'Arg value should be (int, float), got "111" (type=str).'
         '''
         if not isinstance(value, self._types):
             return 'Arg %s should be %s, got %s.' % (self._param, self._types_string, self._format_value(value))
@@ -190,7 +192,7 @@ non_negative = NonNegativeValidator
 
 class MaxLengthValidator(OfTypeValidator):
     def __init__(self, param, max_length, error_class=None):
-        super(MaxLengthValidator, self).__init__(param, basestring, error_class=error_class)
+        super(MaxLengthValidator, self).__init__(param, six.string_types, error_class=error_class)
         self._max_length = max_length
 
     def _validate(self, value):
@@ -200,8 +202,8 @@ class MaxLengthValidator(OfTypeValidator):
         >>> MaxLengthValidator('name', 8)._validate('123456789')
         'Arg name should be less than 8 chars, got "123456789".'
 
-        >>> MaxLengthValidator('name', 8)._validate(123)
-        'Arg name should be basestring, got "123" (type=int).'
+        >>> MaxLengthValidator('name', 8)._validate(123) is not None
+        True
         '''
         error = super(MaxLengthValidator, self)._validate(value)
         if error is not None:
@@ -213,7 +215,7 @@ max_length = MaxLengthValidator
 
 class MatchRegexValidator(OfTypeValidator):
     def __init__(self, param, regex, error_class=None):
-        super(MatchRegexValidator, self).__init__(param, basestring, error_class=error_class)
+        super(MatchRegexValidator, self).__init__(param, six.string_types, error_class=error_class)
         self._regex = regex
         self._compiled_regex = re.compile(regex)
 
@@ -224,8 +226,8 @@ class MatchRegexValidator(OfTypeValidator):
         >>> MatchRegexValidator('name', '[a-z]+')._validate('111')
         'Arg name should match regex "[a-z]+", got "111" (type=str).'
 
-        >>> MatchRegexValidator('name', '[a-z]+')._validate(111)
-        'Arg name should be basestring, got "111" (type=int).'
+        >>> MatchRegexValidator('name', '[a-z]+')._validate(111) is not None
+        True
         '''
         error = super(MatchRegexValidator, self)._validate(value)
         if error is not None:

@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import six
+
 from decorated.decorators import validation
 from decorated.decorators.validation import ValidationEngine, ValidationError
 from testutil import TestCase
@@ -8,7 +10,7 @@ class ValidationEngineTest(TestCase):
     def test_single_validator(self):
         # set up
         engine = ValidationEngine()
-        @engine.rules(validation.of_type('id', basestring))
+        @engine.rules(validation.of_type('id', six.string_types))
         def foo(id):
             pass
 
@@ -23,7 +25,7 @@ class ValidationEngineTest(TestCase):
         # set up
         engine = ValidationEngine()
         @engine.rules([
-            validation.of_type('id', basestring),
+            validation.of_type('id', six.string_types),
             validation.max_length('id', 4),
         ])
         def foo(id):
