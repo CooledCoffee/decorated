@@ -1,4 +1,6 @@
 # -*- coding: UTF-8 -*-
+import importlib
+
 from decorated.base.proxy import Proxy, NoTargetError
 from decorated.util import templates
 import doctest
@@ -67,6 +69,12 @@ class Function(Proxy): # pylint: disable=too-many-instance-attributes
             self.optional_params = func.optional_params
         else:
             self._parse_params(func)
+
+            # this is mainly for doctest purpose
+            # doctest does not test on objects (Function instances)
+            # so we put the original function back into the module
+            mod = importlib.import_module(func.__module__)
+            setattr(mod, '__original_%s' % func.__name__, func)
         self._decorate_or_call = self._call
         return self
     
