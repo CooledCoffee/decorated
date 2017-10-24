@@ -19,5 +19,5 @@ class GetTest(TestCase):
             self.assertIsInstance(ctx.get(), Context)
             
     def test_no_context(self):
-        with self.assertRaises(ContextError):
+        with self.assertRaises(AttributeError):
             ctx.a

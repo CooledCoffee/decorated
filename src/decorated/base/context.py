@@ -95,11 +95,10 @@ class ContextProxy(Proxy):
     @property
     def target(self):
         context = Context._current.get() # pylint: disable=protected-access
-        if context:
-            return context
-        else:
+        if context is None:
             raise ContextError('Context should be set first.')
-    
+        return context
+
     def get(self):
         return self.target
         

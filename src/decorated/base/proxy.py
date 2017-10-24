@@ -11,11 +11,10 @@ class Proxy(object):
         else:
             try:
                 return getattr(self.target, name)
-            except NoTargetError:
-                raise AttributeError("'%s' object has no attribute '%s'" % (type(self).__name__, name))
-            except AttributeError:
-                raise AttributeError("'%s' object has no attribute '%s'" % (type(self).__name__, name))
-            
+            except Exception as e:
+                raise AttributeError("%s object has no attribute '%s'. Inner error is: [%s] %s"
+                                     % (type(self).__name__, name, type(e).__name__, e))
+
     @property
     def target(self):
         if self._target is None:
