@@ -9,7 +9,7 @@ from decorated.decorators.files import TempDir, TempFile, WritingFile
 from decorated.decorators.once import Once, OnceSession
 from decorated.decorators.profile import Profile
 from decorated.decorators.remove_extra_args import RemoveExtraArgs
-from decorated.decorators.retries import Retries
+from decorated.decorators.retries import Retries, RetriesForever
 from decorated.decorators.timeit import TimeIt
 from decorated.decorators.timeout import Timeout
 
@@ -19,6 +19,7 @@ OnceSession = OnceSession
 profile = Profile
 remove_extra_args = RemoveExtraArgs
 retries = Retries
+retries_forever = RetriesForever
 tempfile = TempFile
 tempdir = TempDir
 timeit = TimeIt

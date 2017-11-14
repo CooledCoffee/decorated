@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
+import logging
+import sys
+import time
+
 import six
 
 from decorated.base.function import Function
-import logging
-import time
 
 log = logging.getLogger(__name__)
 
@@ -26,4 +28,7 @@ class Retries(Function):
                     time.sleep(self._delay)
                 else:
                     raise
-        
+
+class RetriesForever(Retries):
+    def _init(self, delay=0, error_types=(Exception,)):
+        super(RetriesForever, self)._init(sys.maxint - 1, delay=delay, error_types=error_types)
