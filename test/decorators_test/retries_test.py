@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-from decorated.decorators.retries import Retries
 from fixtures2 import TestCase
+
+from decorated.decorators.retries import Retries
+
 
 class RetriesTest(TestCase):
     def test_success_at_first(self):
