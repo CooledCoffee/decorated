@@ -29,10 +29,10 @@ class DisableTest(TestCase):
         
     def test_no_arg(self):
         # set up
-        DisableTest.args = []
+        self.args = []
         @Once
         def foo(a):
-            DisableTest.args.append(a)
+            self.args.append(a)
             return a
         self.decorated.disable(Once)
         
