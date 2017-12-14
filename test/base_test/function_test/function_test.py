@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from decorated.base.expression import Expression
 from decorated.base.function import Function, ArgError
 from decorated.util.templates import Template, TemplateError
 from unittest.case import TestCase
@@ -110,15 +111,6 @@ class ResolveArgsTest(TestCase):
     def test_missing_arg(self):
         with self.assertRaises(ArgError):
             foo._resolve_args()
-            
-class EvaluateExpressionTest(TestCase):
-    def test_success(self):
-        result = foo._evaluate_expression('a + b', 1, b=2)
-        self.assertEquals(3, result)
-        
-    def test_failed(self):
-        with self.assertRaises(Exception):
-            foo._evaluate_expression('!@#$%', 1, b=2)
             
 class CompileTemplateTest(TestCase):
     def test_success(self):

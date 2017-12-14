@@ -78,10 +78,6 @@ class Function(Proxy): # pylint: disable=too-many-instance-attributes
         self._decorate_or_call = self._call
         return self
     
-    def _evaluate_expression(self, expression, *args, **kw):
-        arg_dict = self._resolve_args(*args, **kw)
-        return eval(expression, arg_dict) # pylint: disable=eval-used
-        
     def _init(self, *args, **kw):
         pass
     
