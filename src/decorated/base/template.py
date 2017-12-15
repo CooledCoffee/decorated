@@ -1,16 +1,22 @@
 # -*- coding: utf-8 -*-
 import re
 
+from decorated.util import dutil
+
 
 class Template(object):
     def __init__(self, string):
+        self._string = string
         source = _generate_source(string)
         self._code = compile(source, '<string>', 'exec')
         
     def __call__(self, **variables):
-        variables = dict(variables, __builtins__=None, Exception=Exception, str=str)
+        variables = dutil.generate_safe_context(variables)
         exec(self._code, variables)
         return variables['result']
+    
+    def __str__(self):
+        return self._string
 
 def _generate_source(string):
     parts = re.split('(\{.+?\})', string)
