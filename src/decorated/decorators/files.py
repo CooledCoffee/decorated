@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
-from decorated.base.function import ContextFunction
 import os
 import shutil
+
+from decorated.base.function import ContextFunction
+from decorated.base.template import Template
+
 
 class TempObject(ContextFunction):
     def _after(self, ret, *args, **kw):
@@ -10,15 +13,10 @@ class TempObject(ContextFunction):
         
     def _calc_path(self, *args, **kw):
         if self._func is None:
-            return self._path
+            return self._path()
         else:
             arg_dict = self._resolve_args(*args, **kw)
-            return self._path.eval(arg_dict)
-                
-    def _decorate(self, func):
-        super(TempObject, self)._decorate(func)
-        self._path = self._compile_template(self._path)
-        return self
+            return self._path(**arg_dict)
 
     def _delete(self, path):
         raise NotImplementedError()
@@ -35,7 +33,7 @@ class TempObject(ContextFunction):
         
     def _init(self, path, delete_on_success=True, delete_on_error=True): # pylint: disable=arguments-differ
         super(TempObject, self)._init()
-        self._path = path
+        self._path = Template(path)
         self._delete_on_success = delete_on_success
         self._delete_on_error = delete_on_error
         

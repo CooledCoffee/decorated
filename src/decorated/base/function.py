@@ -1,11 +1,9 @@
 # -*- coding: UTF-8 -*-
-import importlib
-
-from decorated.base.proxy import Proxy, NoTargetError
-from decorated.util import templates
-import doctest
 import functools
+import importlib
 import inspect
+
+from decorated.base.proxy import NoTargetError, Proxy
 
 WRAPPER_ASSIGNMENTS = ('__module__', '__name__', '__doc__', '__code__', 'func_code')
 
@@ -56,9 +54,6 @@ class Function(Proxy): # pylint: disable=too-many-instance-attributes
     
     def _call(self, *args, **kw):
         return self._func(*args, **kw)
-    
-    def _compile_template(self, template):
-        return templates.compile(template, self.params)
     
     def _decorate(self, func):
         self._func = func
@@ -202,7 +197,3 @@ def _is_bound_method(func):
     True
     '''
     return hasattr(func, '__self__') and func.__self__ is not None
-
-if __name__ == '__main__':
-    doctest.testmod()
-    

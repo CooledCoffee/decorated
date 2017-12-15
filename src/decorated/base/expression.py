@@ -8,7 +8,7 @@ class Expression(object):
         except SyntaxError:
             raise ExpressionError('Bad expression "%s".' % expression)
         
-    def __call__(self, variables):
+    def __call__(self, **variables):
         variables = dict(variables, __builtins__=None)
         try:
             return eval(self._expression, variables)

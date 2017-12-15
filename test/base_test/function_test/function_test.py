@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from decorated.base.expression import Expression
-from decorated.base.function import Function, ArgError
-from decorated.util.templates import Template, TemplateError
-from unittest.case import TestCase
 import inspect
+from unittest.case import TestCase
+
+from decorated.base.function import ArgError, Function
+
 
 @Function
 def foo(a, b=0):
@@ -111,15 +111,6 @@ class ResolveArgsTest(TestCase):
     def test_missing_arg(self):
         with self.assertRaises(ArgError):
             foo._resolve_args()
-            
-class CompileTemplateTest(TestCase):
-    def test_success(self):
-        template = foo._compile_template('A is {a}.')
-        self.assertIsInstance(template, Template)
-        
-    def test_failed(self):
-        with self.assertRaises(TemplateError):
-            foo._compile_template('C is {c}.')
         
 class CallTest(TestCase):
     def test_no_init_arg(self):

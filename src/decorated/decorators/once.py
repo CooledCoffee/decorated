@@ -8,7 +8,8 @@ from decorated.base.function import Function
 
 class Once(Function):
     def _call(self, *args, **kw):
-        key = self._key(self._resolve_args(*args, **kw))
+        arg_dict = self._resolve_args(*args, **kw)
+        key = self._key(**arg_dict)
         key = (self._func, key)
 
         try:

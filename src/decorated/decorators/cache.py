@@ -2,7 +2,9 @@
 import time
 
 from decorated.base.function import Function
-from decorated.util import modutil, templates
+from decorated.base.template import Template
+from decorated.util import modutil
+
 
 class _CacheDecorator(Function):
     @property
@@ -12,19 +14,13 @@ class _CacheDecorator(Function):
     def _call(self, *args, **kw):
         arg_dict = dict(self._vars)
         arg_dict.update(self._resolve_args(*args, **kw))
-        key = self._key_template.eval(arg_dict)
+        key = self._key(**arg_dict)
         return self._process(key, *args, **kw)
-
-    def _decorate(self, func):
-        super(_CacheDecorator, self)._decorate(func)
-        var_names = self.params + tuple(self._vars.keys())
-        self._key_template = templates.compile(self._key, var_names)
-        return self
 
     def _init(self, cache, key, vars=None, options=None): # pylint: disable=arguments-differ
         super(_CacheDecorator, self)._init()
         self._cache = cache
-        self._key = key
+        self._key = key if callable(key) else Template(key)
         self._vars = vars or {}
         self._options = options
 
