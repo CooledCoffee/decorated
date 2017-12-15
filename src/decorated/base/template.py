@@ -33,7 +33,7 @@ except Exception:
 ''' % (part, part)
             parts[i] = part.strip()
         else:
-            parts[i] = "parts.append('%s')" % part
+            parts[i] = "parts.append('%s')" % part.replace('\n', '\\n').replace("'", "\\'")
     parts = '\n'.join([p for p in parts if p is not None])
     source = '''
 parts = []

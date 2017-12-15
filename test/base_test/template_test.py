@@ -3,7 +3,7 @@ from decorated.base import template
 from decorated.base.template import Template
 from testutil import TestCase
 
-class CompileTest(TestCase):
+class GenerateSourceTest(TestCase):
     def test_single_string(self):
         source = template._generate_source('aaa')
         self.assertMultiLineEqual('''
@@ -79,6 +79,14 @@ try:
 except Exception:
     parts.append('{error:a + b}')
 parts.append(' bbb')
+result = ''.join(parts)
+'''.strip(), source)
+    
+    def test_escaping(self):
+        source = template._generate_source('"\'\n')
+        self.assertMultiLineEqual('''
+parts = []
+parts.append('"\\'\\n')
 result = ''.join(parts)
 '''.strip(), source)
         
