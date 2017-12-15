@@ -3,6 +3,32 @@ from collections import Iterable
 
 import six
 
+_SAFE_BUILTINS = {
+    '__builtins__': None,
+    'Exception': Exception,
+    'False': False,
+    'None': None,
+    'True': True,
+    'float': float,
+    'int': int,
+    'isinstance': isinstance,
+    'issubclass': issubclass,
+    'list': list,
+    'len': len,
+    'max': max,
+    'min': min,
+    'round': round,
+    'sorted': sorted,
+    'str': str,
+    'sum': sum,
+    'tuple': tuple,
+    'type': type,
+}
+
+def generate_safe_context(variables):
+    ctx = dict(variables)
+    ctx.update(_SAFE_BUILTINS)
+    return ctx
 
 def listify(value_or_values):
     '''
