@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
 import re
 
+import six
+
 from decorated.util import dutil
 
-
+if six.PY2:
+    _DEFAULT_STRING_TYPE = 'unicode'
+else:
+    _DEFAULT_STRING_TYPE = 'str'
+    
 class Template(object):
     def __init__(self, string):
         self._string = string
@@ -27,13 +33,13 @@ def _generate_source(string):
             part = part[1:-1]
             part = '''
 try:
-    parts.append(str(%s))
+    parts.append(%s(%s))
 except Exception:
-    parts.append('{error:%s}')
-''' % (part, part)
+    parts.append(u'{error:%s}')
+''' % (_DEFAULT_STRING_TYPE, part, part)
             parts[i] = part.strip()
         else:
-            parts[i] = "parts.append('%s')" % part.replace('\n', '\\n').replace("'", "\\'")
+            parts[i] = "parts.append(u'%s')" % part.replace('\n', '\\n').replace("'", "\\'")
     parts = '\n'.join([p for p in parts if p is not None])
     source = '''
 parts = []

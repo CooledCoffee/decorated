@@ -24,6 +24,8 @@ _SAFE_BUILTINS = {
     'tuple': tuple,
     'type': type,
 }
+if six.PY2:
+    _SAFE_BUILTINS['unicode'] = unicode
 
 def generate_safe_context(variables):
     ctx = dict(variables)
