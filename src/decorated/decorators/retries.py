@@ -23,8 +23,7 @@ class Retries(Function):
                 return super(Retries, self)._call(*args, **kw)
             except Exception as e:
                 if i < self._times and isinstance(e, self._error_types):
-                    log.warn('Execution failed. Will retry in %f seconds. Error was: [%s] %s', self._delay,
-                        type(e).__name__, e)
+                    log.warn('Execution failed. Will retry in %f seconds.', self._delay, exc_info=True)
                     time.sleep(self._delay)
                 else:
                     raise
