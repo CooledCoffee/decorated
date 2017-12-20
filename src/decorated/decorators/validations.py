@@ -1,12 +1,20 @@
 # -*- coding: utf-8 -*-
 import re
 from collections import Iterable
+from decimal import Decimal
 
 import six
 
 from decorated.base.function import WrapperFunction
 from decorated.util import dutil
 
+_NUMBER_TYPES = list(six.integer_types) + [float, Decimal]
+try:
+    from cdecimal import Decimal as CDecimal
+    _NUMBER_TYPES.append(CDecimal)
+except Exception:
+    pass
+_NUMBER_TYPES = tuple(_NUMBER_TYPES)
 
 class ValidationError(Exception):
     pass
@@ -113,11 +121,6 @@ class OfTypeValidator(Validator):
             return 'should be %s' % self._types_string
 of_type = OfTypeValidator
 
-class IsNumberValidator(OfTypeValidator):
-    def __init__(self, param, error_class=None):
-        super(IsNumberValidator, self).__init__(param, (int, float), error_class=error_class)
-is_number = IsNumberValidator
-
 class IsInRangeValidator(Validator):
     def __init__(self, param, lower, upper, error_class=None):
         super(IsInRangeValidator, self).__init__(param, error_class=error_class)
@@ -142,14 +145,19 @@ class IsInRangeValidator(Validator):
             return 'should be in range [%s, %s]' % (self._lower, self._upper)
 is_in_range = IsInRangeValidator
 
+class IsNumberValidator(OfTypeValidator):
+    def __init__(self, param, error_class=None):
+        super(IsNumberValidator, self).__init__(param, _NUMBER_TYPES, error_class=error_class)
+is_number = IsNumberValidator
+
 class IsPositiveValidator(IsNumberValidator):
     def _validate(self, value):
         '''
         >>> IsPositiveValidator('score')._validate(5)
-        >>> IsPositiveValidator('score')._validate('aaa')
-        'should be int/float'
         >>> IsPositiveValidator('score')._validate(-1)
         'should be positive'
+        >>> IsPositiveValidator('score')._validate('aaa') is None
+        False
         '''
         error = super(IsPositiveValidator, self)._validate(value)
         if error is not None:
@@ -165,8 +173,8 @@ class NonNegativeValidator(IsNumberValidator):
         >>> NonNegativeValidator('score')._validate(5)
         >>> NonNegativeValidator('score')._validate(0)
         'should be non negative'
-        >>> NonNegativeValidator('score')._validate('aaa')
-        'should be int/float'
+        >>> NonNegativeValidator('score')._validate('aaa') is None
+        False
         '''
         error = super(NonNegativeValidator, self)._validate(value)
         if error is not None:
@@ -186,8 +194,8 @@ class MaxLengthValidator(OfTypeValidator):
         >>> MaxLengthValidator('name', 8)._validate('12345')
         >>> MaxLengthValidator('name', 8)._validate('123456789')
         'should be less than 8 chars'
-        >>> MaxLengthValidator('name', 8)._validate(123) is not None
-        True
+        >>> MaxLengthValidator('name', 8)._validate(123) is None
+        False
         '''
         error = super(MaxLengthValidator, self)._validate(value)
         if error is not None:
@@ -208,8 +216,8 @@ class MatchRegexValidator(OfTypeValidator):
         >>> MatchRegexValidator('name', '[a-z]+')._validate('aaa')
         >>> MatchRegexValidator('name', '[a-z]+')._validate('111')
         'should match regex "[a-z]+"'
-        >>> MatchRegexValidator('name', '[a-z]+')._validate(111) is not None
-        True
+        >>> MatchRegexValidator('name', '[a-z]+')._validate(111) is None
+        False
         '''
         error = super(MatchRegexValidator, self)._validate(value)
         if error is not None:
