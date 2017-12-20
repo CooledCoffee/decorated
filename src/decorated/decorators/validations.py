@@ -79,6 +79,8 @@ class NotEmptyValidator(Validator):
     def _validate(self, value):
         '''
         >>> NotEmptyValidator('values')._validate(111)
+        >>> NotEmptyValidator('values')._validate(True)
+        >>> NotEmptyValidator('values')._validate(False)
         >>> NotEmptyValidator('values')._validate(None)
         'should not be empty'
         >>> NotEmptyValidator('values')._validate([])
@@ -86,7 +88,7 @@ class NotEmptyValidator(Validator):
         >>> NotEmptyValidator('values')._validate('')
         'should not be empty'
         '''
-        if not value:
+        if not value and not isinstance(value, bool):
             return 'should not be empty'
 not_empty = NotEmptyValidator
 
