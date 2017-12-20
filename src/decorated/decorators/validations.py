@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-from collections import Iterable
-
 import re
+from collections import Iterable
 
 import six
 
@@ -39,69 +38,56 @@ class Validator(object):
 
     def validate(self, arg_dict, default_error_class=None):
         value = arg_dict[self._param]
-        error = self._validate(value)
-        if error is not None:
-            default_error_class = self._error_class or default_error_class
-            e = default_error_class(error)
+        violation = self._validate(value)
+        if violation is not None:
+            error_class = self._error_class or default_error_class
+            msg = 'Arg "%s" %s, got "%s" (type=%s).' % (self._param, violation, value, type(value).__name__)
+            e = error_class(msg)
             e.param = self._param
             raise e
-
-    def _format_value(self, value):
-        '''
-        >>> Validator(None)._format_value(111)
-        '"111" (type=int)'
-        >>> Validator(None)._format_value('111')
-        '"111" (type=str)'
-        '''
-        return '"%s" (type=%s)' % (value, type(value).__name__)
 
     def _validate(self, value):
         raise NotImplementedError()
 
 class IsInValidator(Validator):
-    def __init__(self, param, values, error_class=None):
+    def __init__(self, param, choices, error_class=None):
         super(IsInValidator, self).__init__(param, error_class=error_class)
-        self._values = values
+        self._choices = choices
 
     def _validate(self, value):
         '''
         >>> IsInValidator('id', [1, 2, 3])._validate(2)
-
         >>> IsInValidator('id', [1, 2, 3])._validate(0)
-        'Arg id should be one of [1, 2, 3], got "0" (type=int).'
+        'should be one of [1, 2, 3]'
         '''
-        if value not in self._values:
-            return 'Arg %s should be one of %s, got %s.' % (self._param, self._values, self._format_value(value))
+        if value not in self._choices:
+            return 'should be one of %s' % self._choices
 is_in = IsInValidator
 
 class NotNoneValidator(Validator):
     def _validate(self, value):
         '''
         >>> NotNoneValidator('id')._validate(111)
-
         >>> NotNoneValidator('id')._validate(None)
-        'Arg id should not be none.'
+        'should not be none'
         '''
         if value is None:
-            return 'Arg %s should not be none.' % self._param
+            return 'should not be none'
 not_none = NotNoneValidator
 
 class NotEmptyValidator(Validator):
     def _validate(self, value):
         '''
         >>> NotEmptyValidator('values')._validate(111)
-
         >>> NotEmptyValidator('values')._validate(None)
-        'Arg values should not be empty, got "None" (type=NoneType).'
-
+        'should not be empty'
         >>> NotEmptyValidator('values')._validate([])
-        'Arg values should not be empty, got "[]" (type=list).'
-
+        'should not be empty'
         >>> NotEmptyValidator('values')._validate('')
-        'Arg values should not be empty, got "" (type=str).'
+        'should not be empty'
         '''
         if not value:
-            return 'Arg %s should not be empty, got %s.' % (self._param, self._format_value(value))
+            return 'should not be empty'
 not_empty = NotEmptyValidator
 
 class OfTypeValidator(Validator):
@@ -109,22 +95,20 @@ class OfTypeValidator(Validator):
         super(OfTypeValidator, self).__init__(param, error_class=error_class)
         self._types = types
         if isinstance(types, Iterable):
-            self._types_string = '(%s)' % ', '.join([t.__name__ for t in types])
+            self._types_string = '/'.join([t.__name__ for t in types])
         else:
             self._types_string = types.__name__
 
     def _validate(self, value):
         '''
         >>> OfTypeValidator('value', int)._validate(111)
-
         >>> OfTypeValidator('value', int)._validate('111')
-        'Arg value should be int, got "111" (type=str).'
-
+        'should be int'
         >>> OfTypeValidator('value', (int, float))._validate('111')
-        'Arg value should be (int, float), got "111" (type=str).'
+        'should be int/float'
         '''
         if not isinstance(value, self._types):
-            return 'Arg %s should be %s, got %s.' % (self._param, self._types_string, self._format_value(value))
+            return 'should be %s' % self._types_string
 of_type = OfTypeValidator
 
 class IsNumberValidator(OfTypeValidator):
@@ -140,54 +124,54 @@ class IsInRangeValidator(Validator):
 
     def _validate(self, value):
         '''
+        number value
         >>> IsInRangeValidator('score', 1, 10)._validate(5)
-
         >>> IsInRangeValidator('score', 1, 10)._validate(0)
-        'Arg score should be within [1, 10], got 0.'
-
+        'should be in range [1, 10]'
         >>> IsInRangeValidator('score', 1, 10)._validate(11)
-        'Arg score should be within [1, 10], got 11.'
+        'should be in range [1, 10]'
+
+        string value
+        >>> IsInRangeValidator('rank', 'A', 'D')._validate('B')
+        >>> IsInRangeValidator('rank', 'A', 'D')._validate('E')
+        'should be in range [A, D]'
         '''
         if value < self._lower or value > self._upper:
-            return 'Arg %s should be within [%s, %s], got %s.' % (self._param, self._lower, self._upper, value)
+            return 'should be in range [%s, %s]' % (self._lower, self._upper)
 is_in_range = IsInRangeValidator
 
 class IsPositiveValidator(IsNumberValidator):
     def _validate(self, value):
         '''
         >>> IsPositiveValidator('score')._validate(5)
-
-        >>> IsPositiveValidator('score')._validate(-1)
-        'Arg score should be positive, got "-1".'
-
         >>> IsPositiveValidator('score')._validate('aaa')
-        'Arg score should be (int, float), got "aaa" (type=str).'
+        'should be int/float'
+        >>> IsPositiveValidator('score')._validate(-1)
+        'should be positive'
         '''
         error = super(IsPositiveValidator, self)._validate(value)
         if error is not None:
             return error
 
         if value < 0:
-            return 'Arg %s should be positive, got "%s".' % (self._param, value)
+            return 'should be positive'
 is_positive = IsPositiveValidator
 
 class NonNegativeValidator(IsNumberValidator):
     def _validate(self, value):
         '''
         >>> NonNegativeValidator('score')._validate(5)
-
         >>> NonNegativeValidator('score')._validate(0)
-        'Arg score should be non negative, got "0".'
-
+        'should be non negative'
         >>> NonNegativeValidator('score')._validate('aaa')
-        'Arg score should be (int, float), got "aaa" (type=str).'
+        'should be int/float'
         '''
         error = super(NonNegativeValidator, self)._validate(value)
         if error is not None:
             return error
 
         if value <= 0:
-            return 'Arg %s should be non negative, got "%s".' % (self._param, value)
+            return 'should be non negative'
 non_negative = NonNegativeValidator
 
 class MaxLengthValidator(OfTypeValidator):
@@ -198,10 +182,8 @@ class MaxLengthValidator(OfTypeValidator):
     def _validate(self, value):
         '''
         >>> MaxLengthValidator('name', 8)._validate('12345')
-
         >>> MaxLengthValidator('name', 8)._validate('123456789')
-        'Arg name should be less than 8 chars, got "123456789".'
-
+        'should be less than 8 chars'
         >>> MaxLengthValidator('name', 8)._validate(123) is not None
         True
         '''
@@ -210,7 +192,7 @@ class MaxLengthValidator(OfTypeValidator):
             return error
 
         if len(value) > self._max_length:
-            return 'Arg %s should be less than %d chars, got "%s".' % (self._param, self._max_length, value)
+            return 'should be less than %d chars' % self._max_length
 max_length = MaxLengthValidator
 
 class MatchRegexValidator(OfTypeValidator):
@@ -222,10 +204,8 @@ class MatchRegexValidator(OfTypeValidator):
     def _validate(self, value):
         '''
         >>> MatchRegexValidator('name', '[a-z]+')._validate('aaa')
-
         >>> MatchRegexValidator('name', '[a-z]+')._validate('111')
-        'Arg name should match regex "[a-z]+", got "111" (type=str).'
-
+        'should match regex "[a-z]+"'
         >>> MatchRegexValidator('name', '[a-z]+')._validate(111) is not None
         True
         '''
@@ -234,4 +214,4 @@ class MatchRegexValidator(OfTypeValidator):
             return error
 
         if not self._compiled_regex.match(value):
-            return 'Arg %s should match regex "%s", got %s.' % (self._param, self._regex, self._format_value(value))
+            return 'should match regex "%s"' % self._regex
