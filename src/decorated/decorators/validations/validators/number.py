@@ -45,13 +45,7 @@ class GeValidator(NumberValidator):
         >>> GeValidator('value', 0)._validate(0)
         >>> GeValidator('value', 0)._validate(-1)
         'should be >=0'
-        >>> GeValidator('value', 0)._validate('a') is None
-        False
         '''
-        error = super(GeValidator, self)._validate(value)
-        if error is not None:
-            return error
-
         if value < self._threshold:
             return 'should be >=%s' % self._threshold
 
@@ -67,13 +61,7 @@ class GtValidator(NumberValidator):
         'should be >0'
         >>> GtValidator('value', 0)._validate(-1)
         'should be >0'
-        >>> GtValidator('value', 0)._validate('a') is None
-        False
         '''
-        error = super(GtValidator, self)._validate(value)
-        if error is not None:
-            return error
-
         if value <= self._threshold:
             return 'should be >%s' % self._threshold
 
@@ -88,13 +76,7 @@ class LeValidator(NumberValidator):
         >>> LeValidator('value', 0)._validate(0)
         >>> LeValidator('value', 0)._validate(1)
         'should be <=0'
-        >>> LeValidator('value', 0)._validate('a') is None
-        False
         '''
-        error = super(LeValidator, self)._validate(value)
-        if error is not None:
-            return error
-
         if value > self._threshold:
             return 'should be <=%s' % self._threshold
 
@@ -110,13 +92,7 @@ class LtValidator(NumberValidator):
         'should be <0'
         >>> LtValidator('value', 0)._validate(1)
         'should be <0'
-        >>> LtValidator('value', 0)._validate('a') is None
-        False
         '''
-        error = super(LtValidator, self)._validate(value)
-        if error is not None:
-            return error
-
         if value >= self._threshold:
             return 'should be <%s' % self._threshold
 
@@ -126,13 +102,7 @@ class PositiveValidator(NumberValidator):
         >>> PositiveValidator('score')._validate(5)
         >>> PositiveValidator('score')._validate(-1)
         'should be positive'
-        >>> PositiveValidator('score')._validate('aaa') is None
-        False
         '''
-        error = super(PositiveValidator, self)._validate(value)
-        if error is not None:
-            return error
-
         if value < 0:
             return 'should be positive'
 
@@ -142,13 +112,7 @@ class NonNegativeValidator(NumberValidator):
         >>> NonNegativeValidator('score')._validate(5)
         >>> NonNegativeValidator('score')._validate(0)
         'should be non negative'
-        >>> NonNegativeValidator('score')._validate('aaa') is None
-        False
         '''
-        error = super(NonNegativeValidator, self)._validate(value)
-        if error is not None:
-            return error
-
         if value <= 0:
             return 'should be non negative'
         
