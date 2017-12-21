@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 import six
-from decorated.base.expression import Expression
 
+from decorated.base.expression import Expression
 from decorated.decorators import validations
-from decorated.decorators.validations import ValidationEngine, ValidationError, Validator
+from decorated.decorators.validations.engine import ValidationEngine
+from decorated.decorators.validations.errors import ValidationError
+from decorated.decorators.validations.validators import TypeValidator, MaxLengthValidator
+from decorated.decorators.validations.validators.base import Validator
 from testutil import TestCase
 
 
@@ -48,7 +51,7 @@ class ValidationEngineTest(TestCase):
     def test_single_validator(self):
         # set up
         engine = ValidationEngine()
-        @engine.rules(validations.type('id', six.string_types))
+        @engine.rules(TypeValidator('id', six.string_types))
         def foo(id):
             pass
 
@@ -63,8 +66,8 @@ class ValidationEngineTest(TestCase):
         # set up
         engine = ValidationEngine()
         @engine.rules([
-            validations.type('id', six.string_types),
-            validations.max_length('id', 4),
+            TypeValidator('id', six.string_types),
+            MaxLengthValidator('id', 4),
         ])
         def foo(id):
             pass
