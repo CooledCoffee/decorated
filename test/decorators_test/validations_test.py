@@ -2,10 +2,9 @@
 import six
 
 from decorated.base.expression import Expression
-from decorated.decorators import validations
+from decorated.decorators.validations import TypeValidator, MaxLengthValidator
 from decorated.decorators.validations.engine import ValidationEngine
 from decorated.decorators.validations.errors import ValidationError
-from decorated.decorators.validations.validators import TypeValidator, MaxLengthValidator
 from decorated.decorators.validations.validators.base import Validator
 from testutil import TestCase
 

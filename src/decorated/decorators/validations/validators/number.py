@@ -27,12 +27,98 @@ class BetweenValidator(NumberValidator):
         '''
         >>> BetweenValidator('score', 1, 10)._validate(5)
         >>> BetweenValidator('score', 1, 10)._validate(0)
-        'should be between "1" and "10"'
+        'should be between 1 and 10'
         >>> BetweenValidator('score', 1, 10)._validate(11)
-        'should be between "1" and "10"'
+        'should be between 1 and 10'
         '''
         if value < self._lower or value > self._upper:
-            return 'should be between "%s" and "%s"' % (self._lower, self._upper)
+            return 'should be between %s and %s' % (self._lower, self._upper)
+
+class GeValidator(NumberValidator):
+    def __init__(self, param, threshold, error_class=None):
+        super(GeValidator, self).__init__(param, error_class=error_class)
+        self._threshold = threshold
+    
+    def _validate(self, value):
+        '''
+        >>> GeValidator('value', 0)._validate(1)
+        >>> GeValidator('value', 0)._validate(0)
+        >>> GeValidator('value', 0)._validate(-1)
+        'should be >=0'
+        >>> GeValidator('value', 0)._validate('a') is None
+        False
+        '''
+        error = super(GeValidator, self)._validate(value)
+        if error is not None:
+            return error
+
+        if value < self._threshold:
+            return 'should be >=%s' % self._threshold
+
+class GtValidator(NumberValidator):
+    def __init__(self, param, threshold, error_class=None):
+        super(GtValidator, self).__init__(param, error_class=error_class)
+        self._threshold = threshold
+        
+    def _validate(self, value):
+        '''
+        >>> GtValidator('value', 0)._validate(1)
+        >>> GtValidator('value', 0)._validate(0)
+        'should be >0'
+        >>> GtValidator('value', 0)._validate(-1)
+        'should be >0'
+        >>> GtValidator('value', 0)._validate('a') is None
+        False
+        '''
+        error = super(GtValidator, self)._validate(value)
+        if error is not None:
+            return error
+
+        if value <= self._threshold:
+            return 'should be >%s' % self._threshold
+
+class LeValidator(NumberValidator):
+    def __init__(self, param, threshold, error_class=None):
+        super(LeValidator, self).__init__(param, error_class=error_class)
+        self._threshold = threshold
+    
+    def _validate(self, value):
+        '''
+        >>> LeValidator('value', 0)._validate(-1)
+        >>> LeValidator('value', 0)._validate(0)
+        >>> LeValidator('value', 0)._validate(1)
+        'should be <=0'
+        >>> LeValidator('value', 0)._validate('a') is None
+        False
+        '''
+        error = super(LeValidator, self)._validate(value)
+        if error is not None:
+            return error
+
+        if value > self._threshold:
+            return 'should be <=%s' % self._threshold
+
+class LtValidator(NumberValidator):
+    def __init__(self, param, threshold, error_class=None):
+        super(LtValidator, self).__init__(param, error_class=error_class)
+        self._threshold = threshold
+    
+    def _validate(self, value):
+        '''
+        >>> LtValidator('value', 0)._validate(-1)
+        >>> LtValidator('value', 0)._validate(0)
+        'should be <0'
+        >>> LtValidator('value', 0)._validate(1)
+        'should be <0'
+        >>> LtValidator('value', 0)._validate('a') is None
+        False
+        '''
+        error = super(LtValidator, self)._validate(value)
+        if error is not None:
+            return error
+
+        if value >= self._threshold:
+            return 'should be <%s' % self._threshold
 
 class PositiveValidator(NumberValidator):
     def _validate(self, value):
