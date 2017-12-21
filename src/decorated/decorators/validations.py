@@ -4,7 +4,6 @@ from collections import Iterable
 from decimal import Decimal
 
 import six
-from decorated.base.expression import Expression
 
 from decorated.base.function import WrapperFunction
 from decorated.util import dutil
@@ -46,20 +45,6 @@ class Validator(object):
         self._error_class = error_class
 
     def validate(self, arg_dict, default_error_class=None):
-        '''
-        pass
-        >>> validator = Validator('key')
-        >>> validator._validate = lambda v: None
-        >>> validator.validate({'key': 'aaa'}, default_error_class=ValidationError)
-        
-        failed
-        >>> validator = Validator('key')
-        >>> validator._validate = lambda v: 'should not be none'
-        >>> validator.validate({'key': None}, default_error_class=ValidationError)
-        Traceback (most recent call last):
-        ...
-        ValidationError: Arg "key" should not be none, got "None" (type=NoneType).
-        '''
         error_class = self._error_class or default_error_class
         value = self._eval_value(arg_dict, error_class)
         violation = self._validate(value)
@@ -71,31 +56,6 @@ class Validator(object):
         raise e
 
     def _eval_value(self, arg_dict, error_class):
-        '''
-        basic
-        >>> validator = Validator('key')
-        >>> validator._eval_value({'key': 'aaa'}, ValidationError)
-        'aaa'
-        
-        arg not found
-        >>> validator = Validator('key')
-        >>> validator._eval_value({}, ValidationError)
-        Traceback (most recent call last):
-        ...
-        ValidationError: Arg "key" is missing.
-        
-        expression
-        >>> validator = Validator(Expression('key.upper()'))
-        >>> validator._eval_value({'key': 'aaa'}, ValidationError)
-        'AAA'
-        
-        expression failed
-        >>> validator = Validator(Expression('key.upper()'))
-        >>> validator._eval_value({'key': 1}, ValidationError)
-        Traceback (most recent call last):
-        ...
-        ValidationError: Arg "key.upper()" is missing or malformed.
-        '''
         if callable(self._param):
             try:
                 value = self._param(**arg_dict)
