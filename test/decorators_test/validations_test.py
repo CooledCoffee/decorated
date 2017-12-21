@@ -48,7 +48,7 @@ class ValidationEngineTest(TestCase):
     def test_single_validator(self):
         # set up
         engine = ValidationEngine()
-        @engine.rules(validations.of_type('id', six.string_types))
+        @engine.rules(validations.type('id', six.string_types))
         def foo(id):
             pass
 
@@ -63,7 +63,7 @@ class ValidationEngineTest(TestCase):
         # set up
         engine = ValidationEngine()
         @engine.rules([
-            validations.of_type('id', six.string_types),
+            validations.type('id', six.string_types),
             validations.max_length('id', 4),
         ])
         def foo(id):

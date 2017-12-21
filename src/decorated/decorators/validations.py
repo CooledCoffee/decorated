@@ -71,20 +71,44 @@ class Validator(object):
     def _validate(self, value):
         raise NotImplementedError()
 
-class IsInValidator(Validator):
+class BetweenValidator(Validator):
+    def __init__(self, param, lower, upper, error_class=None):
+        super(BetweenValidator, self).__init__(param, error_class=error_class)
+        self._lower = lower
+        self._upper = upper
+
+    def _validate(self, value):
+        '''
+        number value
+        >>> BetweenValidator('score', 1, 10)._validate(5)
+        >>> BetweenValidator('score', 1, 10)._validate(0)
+        'should be between "1" and "10"'
+        >>> BetweenValidator('score', 1, 10)._validate(11)
+        'should be between "1" and "10"'
+
+        string value
+        >>> BetweenValidator('rank', 'A', 'D')._validate('B')
+        >>> BetweenValidator('rank', 'A', 'D')._validate('E')
+        'should be between "A" and "D"'
+        '''
+        if value < self._lower or value > self._upper:
+            return 'should be between "%s" and "%s"' % (self._lower, self._upper)
+between = BetweenValidator
+
+class ChoicesValidator(Validator):
     def __init__(self, param, choices, error_class=None):
-        super(IsInValidator, self).__init__(param, error_class=error_class)
+        super(ChoicesValidator, self).__init__(param, error_class=error_class)
         self._choices = choices
 
     def _validate(self, value):
         '''
-        >>> IsInValidator('id', [1, 2, 3])._validate(2)
-        >>> IsInValidator('id', [1, 2, 3])._validate(0)
+        >>> ChoicesValidator('id', [1, 2, 3])._validate(2)
+        >>> ChoicesValidator('id', [1, 2, 3])._validate(0)
         'should be one of [1, 2, 3]'
         '''
         if value not in self._choices:
             return 'should be one of %s' % self._choices
-is_in = IsInValidator
+choices = ChoicesValidator
 
 class NotNoneValidator(Validator):
     def _validate(self, value):
@@ -114,9 +138,9 @@ class NotEmptyValidator(Validator):
             return 'should not be empty'
 not_empty = NotEmptyValidator
 
-class OfTypeValidator(Validator):
+class TypeValidator(Validator):
     def __init__(self, param, types, error_class=None):
-        super(OfTypeValidator, self).__init__(param, error_class=error_class)
+        super(TypeValidator, self).__init__(param, error_class=error_class)
         self._types = types
         if isinstance(types, Iterable):
             self._types_string = '/'.join([t.__name__ for t in types])
@@ -125,63 +149,39 @@ class OfTypeValidator(Validator):
 
     def _validate(self, value):
         '''
-        >>> OfTypeValidator('value', int)._validate(111)
-        >>> OfTypeValidator('value', int)._validate('111')
+        >>> TypeValidator('value', int)._validate(111)
+        >>> TypeValidator('value', int)._validate('111')
         'should be int'
-        >>> OfTypeValidator('value', (int, float))._validate('111')
+        >>> TypeValidator('value', (int, float))._validate('111')
         'should be int/float'
         '''
         if not isinstance(value, self._types):
             return 'should be %s' % self._types_string
-of_type = OfTypeValidator
+type = TypeValidator
 
-class IsInRangeValidator(Validator):
-    def __init__(self, param, lower, upper, error_class=None):
-        super(IsInRangeValidator, self).__init__(param, error_class=error_class)
-        self._lower = lower
-        self._upper = upper
-
-    def _validate(self, value):
-        '''
-        number value
-        >>> IsInRangeValidator('score', 1, 10)._validate(5)
-        >>> IsInRangeValidator('score', 1, 10)._validate(0)
-        'should be in range [1, 10]'
-        >>> IsInRangeValidator('score', 1, 10)._validate(11)
-        'should be in range [1, 10]'
-
-        string value
-        >>> IsInRangeValidator('rank', 'A', 'D')._validate('B')
-        >>> IsInRangeValidator('rank', 'A', 'D')._validate('E')
-        'should be in range [A, D]'
-        '''
-        if value < self._lower or value > self._upper:
-            return 'should be in range [%s, %s]' % (self._lower, self._upper)
-is_in_range = IsInRangeValidator
-
-class IsNumberValidator(OfTypeValidator):
+class NumberValidator(TypeValidator):
     def __init__(self, param, error_class=None):
-        super(IsNumberValidator, self).__init__(param, _NUMBER_TYPES, error_class=error_class)
-is_number = IsNumberValidator
+        super(NumberValidator, self).__init__(param, _NUMBER_TYPES, error_class=error_class)
+number = NumberValidator
 
-class IsPositiveValidator(IsNumberValidator):
+class PositiveValidator(NumberValidator):
     def _validate(self, value):
         '''
-        >>> IsPositiveValidator('score')._validate(5)
-        >>> IsPositiveValidator('score')._validate(-1)
+        >>> PositiveValidator('score')._validate(5)
+        >>> PositiveValidator('score')._validate(-1)
         'should be positive'
-        >>> IsPositiveValidator('score')._validate('aaa') is None
+        >>> PositiveValidator('score')._validate('aaa') is None
         False
         '''
-        error = super(IsPositiveValidator, self)._validate(value)
+        error = super(PositiveValidator, self)._validate(value)
         if error is not None:
             return error
 
         if value < 0:
             return 'should be positive'
-is_positive = IsPositiveValidator
+positive = PositiveValidator
 
-class NonNegativeValidator(IsNumberValidator):
+class NonNegativeValidator(NumberValidator):
     def _validate(self, value):
         '''
         >>> NonNegativeValidator('score')._validate(5)
@@ -198,7 +198,7 @@ class NonNegativeValidator(IsNumberValidator):
             return 'should be non negative'
 non_negative = NonNegativeValidator
 
-class MaxLengthValidator(OfTypeValidator):
+class MaxLengthValidator(TypeValidator):
     def __init__(self, param, max_length, error_class=None):
         super(MaxLengthValidator, self).__init__(param, six.string_types, error_class=error_class)
         self._max_length = max_length
@@ -219,23 +219,24 @@ class MaxLengthValidator(OfTypeValidator):
             return 'should be less than %d chars' % self._max_length
 max_length = MaxLengthValidator
 
-class MatchRegexValidator(OfTypeValidator):
+class RegexValidator(TypeValidator):
     def __init__(self, param, regex, error_class=None):
-        super(MatchRegexValidator, self).__init__(param, six.string_types, error_class=error_class)
+        super(RegexValidator, self).__init__(param, six.string_types, error_class=error_class)
         self._regex = regex
         self._compiled_regex = re.compile(regex)
 
     def _validate(self, value):
         '''
-        >>> MatchRegexValidator('name', '[a-z]+')._validate('aaa')
-        >>> MatchRegexValidator('name', '[a-z]+')._validate('111')
+        >>> RegexValidator('name', '[a-z]+')._validate('aaa')
+        >>> RegexValidator('name', '[a-z]+')._validate('111')
         'should match regex "[a-z]+"'
-        >>> MatchRegexValidator('name', '[a-z]+')._validate(111) is None
+        >>> RegexValidator('name', '[a-z]+')._validate(111) is None
         False
         '''
-        error = super(MatchRegexValidator, self)._validate(value)
+        error = super(RegexValidator, self)._validate(value)
         if error is not None:
             return error
 
         if not self._compiled_regex.match(value):
             return 'should match regex "%s"' % self._regex
+regex = RegexValidator
