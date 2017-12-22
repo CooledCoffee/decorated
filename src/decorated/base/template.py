@@ -16,9 +16,9 @@ class Template(object):
         source = _generate_source(string)
         self._code = compile(source, '<string>', 'exec')
         
-    def __call__(self, **variables):
+    def __call__(_template_self, **variables): # variables may contain a "self" key
         variables = dutil.generate_safe_context(variables)
-        exec(self._code, variables)
+        exec(_template_self._code, variables)
         return variables['result']
     
     def __str__(self):

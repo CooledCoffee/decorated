@@ -10,12 +10,12 @@ class Expression(object):
         except SyntaxError:
             raise ExpressionError('Bad expression "%s".' % string)
         
-    def __call__(self, **variables):
+    def __call__(_expression_self, **variables): # variables may contain a "self" key
         variables = dutil.generate_safe_context(variables)
         try:
-            return eval(self._expression, variables)
+            return eval(_expression_self._expression, variables)
         except Exception as e:
-            raise ExpressionError('Failed to evaluate expression "%s". Error was: %s' % (self._string, e))
+            raise ExpressionError('Failed to evaluate expression "%s". Error was: %s' % (_expression_self._string, e))
         
     def __str__(self):
         return self._string
