@@ -4,7 +4,7 @@ import setuptools
 
 setup(
     name='decorated',
-    version='1.9.1',
+    version='1.9.2',
     author='Mengchen LEE',
     author_email='CooledCoffee@gmail.com',
     classifiers = [
