@@ -4,9 +4,8 @@ import setuptools
 
 setup(
     name='decorated',
-    version='1.9.2',
+    version='1.9.3',
     author='Mengchen LEE',
-    author_email='CooledCoffee@gmail.com',
     classifiers = [
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
