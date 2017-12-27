@@ -28,8 +28,8 @@ if six.PY2:
     _SAFE_BUILTINS['unicode'] = unicode
 
 def generate_safe_context(variables):
-    ctx = dict(variables)
-    ctx.update(_SAFE_BUILTINS)
+    ctx = dict(_SAFE_BUILTINS)
+    ctx.update(variables)
     return ctx
 
 def listify(value_or_values):
