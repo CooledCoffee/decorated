@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from collections import Iterable
 
+from decorated.base.expression import Expression
+
 from decorated.decorators.validations.validators.base import Validator
 
 
@@ -17,7 +19,17 @@ class ChoicesValidator(Validator):
         '''
         if value not in self._choices:
             return 'should be one of %s' % self._choices
-
+        
+class FalseValidator(Validator):
+    def _validate(self, value):
+        '''
+        >>> FalseValidator(Expression('a > b'))._validate(False)
+        >>> FalseValidator(Expression('a > b'))._validate(True)
+        'should be false'
+        '''
+        if value:
+            return 'should be false'
+        
 class NotNoneValidator(Validator):
     def _validate(self, value):
         '''
@@ -43,7 +55,17 @@ class NotEmptyValidator(Validator):
         '''
         if not value and not isinstance(value, bool):
             return 'should not be empty'
-
+        
+class TrueValidator(Validator):
+    def _validate(self, value):
+        '''
+        >>> TrueValidator(Expression('a > b'))._validate(True)
+        >>> TrueValidator(Expression('a > b'))._validate(False)
+        'should be true'
+        '''
+        if not value:
+            return 'should be true'
+        
 class TypeValidator(Validator):
     def __init__(self, param, types, error_class=None):
         super(TypeValidator, self).__init__(param, error_class=error_class)

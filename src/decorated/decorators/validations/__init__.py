@@ -1,15 +1,17 @@
 #!/usr/bin/python
 from decorated.decorators.validations.engine import ValidationEngine
-from decorated.decorators.validations.validators.misc import ChoicesValidator, NotEmptyValidator, NotNoneValidator, \
-    TypeValidator
-from decorated.decorators.validations.validators.number import BetweenValidator, NonNegativeValidator, NumberValidator, \
-    PositiveValidator, GeValidator, GtValidator, LeValidator, LtValidator
+from decorated.decorators.validations.errors import ValidationError
+from decorated.decorators.validations.validators.misc import ChoicesValidator, FalseValidator, NotEmptyValidator, \
+    NotNoneValidator, TrueValidator, TypeValidator
+from decorated.decorators.validations.validators.number import BetweenValidator, GeValidator, GtValidator, LeValidator, \
+    LtValidator, NonNegativeValidator, NumberValidator, PositiveValidator
 from decorated.decorators.validations.validators.string import MaxLengthValidator, RegexValidator
 
 engine = ValidationEngine()
 
 between = BetweenValidator
 choices = ChoicesValidator
+false = FalseValidator
 ge = GeValidator
 gt = GtValidator
 le = LeValidator
@@ -21,4 +23,5 @@ non_negative = NonNegativeValidator
 number = NumberValidator
 positive = PositiveValidator
 regex = RegexValidator
+true = TrueValidator
 type = TypeValidator
