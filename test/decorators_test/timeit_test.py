@@ -20,6 +20,17 @@ class TimeItTest(TestCase):
         self.assertEqual(1, timing.iterations)
         self.assertEqual(1, timing.repeats)
         self.assertEqual(1, len(timing.timings))
+
+    def test_ratio(self):
+        # set up
+        @TimeIt(ratio=0, reporter=_reporter)
+        def foo(a, b=0):
+            return 1
+    
+        # test
+        result = foo(1)
+        self.assertEqual(1, result)
+        self.assertIsNotNone(timing)
         
     def test_iterations(self):
         # set up

@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
+import random
+import sys
+import time
+
 from decorated.base.function import Function
 from decorated.util import reporters
 from decorated.util.gcutil import DisableGc
-import doctest
-import sys
-import time
 
 if sys.platform == "win32":
     # On Windows, the best timer is time.clock()
@@ -15,22 +16,26 @@ else:
 
 class TimeIt(Function):
     def _call(self, *args, **kw):
-        timings = [None] * self._repeats
-        with DisableGc():
-            for i in range(self._repeats):
-                begin = timer()
-                for _ in range(self._iterations):
-                    result = super(TimeIt, self)._call(*args, **kw)
-                seconds = timer() - begin
-                timings[i] = seconds
-        timing = Result(self._func, args, kw, self._iterations,
-                self._repeats, timings)
-        self._reporter(timing)
-        return result
+        if random.random() < self._ratio:
+            timings = [None] * self._repeats
+            with DisableGc():
+                for i in range(self._repeats):
+                    begin = timer()
+                    for _ in range(self._iterations):
+                        result = super(TimeIt, self)._call(*args, **kw)
+                    seconds = timer() - begin
+                    timings[i] = seconds
+            timing = Result(self._func, args, kw, self._iterations,
+                    self._repeats, timings)
+            self._reporter(timing)
+            return result
+        else:
+            return super(TimeIt, self)._call(*args, **kw)
     
-    def _init(self, iterations=1, repeats=1, reporter=reporters.PRINT_REPORTER): # pylint: disable=arguments-differ
+    def _init(self, iterations=1, ratio=1, repeats=1, reporter=reporters.PRINT_REPORTER): # pylint: disable=arguments-differ
         super(TimeIt, self)._init()
         self._iterations = iterations
+        self._ratio = ratio
         self._repeats = repeats
         self._reporter = reporter
         
@@ -68,7 +73,3 @@ class Result(object):
         args = ', '.join(args)
         return 'Timing of %s.%s(%s): %s (iterations=%d)' \
                 % (self.func.__module__, self.func.__name__, args, self.timings, self.iterations)
-    
-if __name__ == '__main__':
-    doctest.testmod()
-    
