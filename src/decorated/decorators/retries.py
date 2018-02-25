@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
+import itertools
 import logging
-import sys
 import time
 
 import six
@@ -10,7 +10,7 @@ from decorated.base.function import Function
 log = logging.getLogger(__name__)
 
 class Retries(Function):
-    def _init(self, times, delay=0, error_types=(Exception,)): # pylint: disable=arguments-differ
+    def _init(self, times, delay=0, error_types=(Exception,)):
         if times < 0:
             raise Exception('Times cannot be negative.')
         self._times = times
@@ -18,11 +18,11 @@ class Retries(Function):
         self._error_types = error_types
         
     def _call(self, *args, **kw):
-        for i in six.moves.xrange(self._times + 1):
+        for i in _iter(self._times):
             try:
                 return super(Retries, self)._call(*args, **kw)
             except Exception as e:
-                if i < self._times and isinstance(e, self._error_types):
+                if i > 0 and isinstance(e, self._error_types):
                     log.warn('Execution failed. Will retry in %f seconds.', self._delay, exc_info=True)
                     time.sleep(self._delay)
                 else:
@@ -30,4 +30,23 @@ class Retries(Function):
 
 class RetriesForever(Retries):
     def _init(self, delay=0, error_types=(Exception,)):
-        super(RetriesForever, self)._init(sys.maxint - 1, delay=delay, error_types=error_types)
+        # noinspection PyTypeChecker
+        super(RetriesForever, self)._init(None, delay=delay, error_types=error_types)
+
+
+def _iter(times):
+    '''
+    >>> list(_iter(3))
+    [3, 2, 1, 0]
+    
+    >>> it = _iter(None)
+    >>> next(it)
+    1
+    >>> next(it)
+    1
+    '''
+    if times is None:
+        return itertools.cycle([1])
+    else:
+        # noinspection PyUnresolvedReferences
+        return six.moves.xrange(times, -1, -1)
