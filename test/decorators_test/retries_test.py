@@ -34,16 +34,6 @@ class RetriesTest(TestCase):
             foo()
         self.assertEqual(4, foo.times)
         
-    def test_invalid_times(self):
-        with self.assertRaises(Exception):
-            @Retries(-1)
-            def foo():
-                pass
-        with self.assertRaises(Exception):
-            @Retries(-1)
-            def bar():
-                pass
-        
     def test_error_types(self):
         @Retries(3, error_types=(IOError, TypeError))
         def foo():
@@ -53,4 +43,3 @@ class RetriesTest(TestCase):
         with self.assertRaises(Exception):
             foo()
         self.assertEqual(1, foo.times)
-        

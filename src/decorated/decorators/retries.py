@@ -11,8 +11,6 @@ log = logging.getLogger(__name__)
 
 class Retries(Function):
     def _init(self, times, delay=0, error_types=(Exception,)):
-        if times < 0:
-            raise Exception('Times cannot be negative.')
         self._times = times
         self._delay = delay
         self._error_types = error_types
