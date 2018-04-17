@@ -16,10 +16,13 @@ class ChoicesValidator(Validator):
         >>> ChoicesValidator('id', [1, 2, 3])._validate(2)
         >>> ChoicesValidator('id', [1, 2, 3])._validate(0)
         'should be one of [1, 2, 3]'
+        >>> ChoicesValidator('id', (1, 2, 3))._validate(0)
+        'should be one of (1, 2, 3)'
         '''
         if value not in self._choices:
-            return 'should be one of %s' % self._choices
+            return 'should be one of %s' % (self._choices,)
         
+
 class FalseValidator(Validator):
     def _validate(self, value):
         '''
@@ -30,6 +33,7 @@ class FalseValidator(Validator):
         if value:
             return 'should be false'
         
+
 class NotNoneValidator(Validator):
     def _validate(self, value):
         '''
@@ -39,6 +43,7 @@ class NotNoneValidator(Validator):
         '''
         if value is None:
             return 'should not be none'
+
 
 class NotEmptyValidator(Validator):
     def _validate(self, value):
@@ -56,6 +61,7 @@ class NotEmptyValidator(Validator):
         if not value and not isinstance(value, bool):
             return 'should not be empty'
         
+
 class TrueValidator(Validator):
     def _validate(self, value):
         '''
@@ -66,6 +72,7 @@ class TrueValidator(Validator):
         if not value:
             return 'should be true'
         
+
 class TypeValidator(Validator):
     def __init__(self, param, types, error_class=None):
         super(TypeValidator, self).__init__(param, error_class=error_class)
@@ -85,4 +92,3 @@ class TypeValidator(Validator):
         '''
         if not isinstance(value, self._types):
             return 'should be %s' % self._types_string
-        
