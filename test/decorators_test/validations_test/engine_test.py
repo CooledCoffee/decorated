@@ -4,10 +4,10 @@ import six
 from decorated.decorators.validations import TypeValidator, MaxLengthValidator
 from decorated.decorators.validations.engine import ValidationEngine
 from decorated.decorators.validations.errors import ValidationError
-from testutil import TestCase
+from testutil import DecoratedTest
 
 
-class ValidationEngineTest(TestCase):
+class ValidationEngineTest(DecoratedTest):
     def test_single_validator(self):
         # set up
         engine = ValidationEngine()

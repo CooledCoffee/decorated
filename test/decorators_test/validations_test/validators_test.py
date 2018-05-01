@@ -2,10 +2,10 @@
 from decorated.base.expression import Expression
 from decorated.decorators.validations.errors import ValidationError
 from decorated.decorators.validations.validators.base import Validator
-from testutil import TestCase
+from testutil import DecoratedTest
 
 
-class EvalValueTest(TestCase):
+class EvalValueTest(DecoratedTest):
     def test_basic(self):
         validator = Validator('key')
         result = validator._eval_value({'key': 'aaa'}, ValidationError)
@@ -26,7 +26,7 @@ class EvalValueTest(TestCase):
         with self.assertRaises(ValidationError):
             validator._eval_value({'key': 1}, ValidationError)
 
-class ValidateTest(TestCase):
+class ValidateTest(DecoratedTest):
     def test_pass(self):
         class TestValidator(Validator):
             def _validate(self, value):

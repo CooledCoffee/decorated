@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from decorated.base.expression import Expression, ExpressionError
-from testutil import TestCase
+from testutil import DecoratedTest
 
 
-class ExpressionTest(TestCase):
+class ExpressionTest(DecoratedTest):
     def test_success(self):
         expression = Expression('a + b')
         result = expression(a=1, b=2)

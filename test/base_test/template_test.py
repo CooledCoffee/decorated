@@ -3,9 +3,9 @@ import six
 
 from decorated.base import template
 from decorated.base.template import Template
-from testutil import TestCase
+from testutil import DecoratedTest
 
-class GenerateSourceTest(TestCase):
+class GenerateSourceTest(DecoratedTest):
     def test_single_string(self):
         source = template._generate_source('aaa')
         self.assertMultiLineEqual('''
@@ -111,7 +111,7 @@ parts.append(u'"\\'\\n')
 result = ''.join(parts)
 '''.strip(), source)
         
-class TemplateTest(TestCase):
+class TemplateTest(DecoratedTest):
     def test_success(self):
         template = Template('aaa {a + b} bbb')
         result = template(a=1, b=2)

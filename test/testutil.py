@@ -2,8 +2,9 @@
 from fixtures._fixtures.tempdir import TempDir
 from fixtures2 import TestCase
 
-class TestCase(TestCase):
+
+class DecoratedTest(TestCase):
+    # noinspection PyAttributeOutsideInit
     def setUp(self):
-        super(TestCase, self).setUp()
+        super(DecoratedTest, self).setUp()
         self.tempdir = self.useFixture(TempDir())
-        
