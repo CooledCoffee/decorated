@@ -4,7 +4,7 @@ import setuptools
 
 setup(
     name='decorated',
-    version='1.9.8',
+    version='1.9.9',
     author='Mengchen LEE',
     classifiers = [
         'Development Status :: 4 - Beta',
