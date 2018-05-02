@@ -17,11 +17,14 @@ setup(
     ],
     description='Decorator framework and common decorators for python.',
     extras_require={
-        'test': ['pylru'],
+        'test': [
+            'fixtures>=3.0.0',
+            'pylru>=1.0.9',
+        ],
     },
     install_requires=[
         'fixtures2>=0.1.2',
-        'six',
+        'six>=1.11.0',
     ],
     package_dir={'': 'src'},
     packages=setuptools.find_packages(where='src'),
